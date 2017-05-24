@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="github.com/kosior">
+    <base target="_blank">
+    <title>TAKTYK</title>
+    <style>
+        html, body, div, span, applet, object, iframe,
+        h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+        a, abbr, acronym, address, big, cite, code,
+        del, dfn, em, img, ins, kbd, q, s, samp,
+        small, strike, strong, sub, sup, tt, var,
+        b, u, i, center,
+        dl, dt, dd, ol, ul, li,
+        fieldset, form, label, legend,
+        table, caption, tbody, tfoot, thead, tr, th, td,
+        article, aside, canvas, details, embed,
+        figure, figcaption, footer, header, hgroup,
+        menu, nav, output, ruby, section, summary,
+        time, mark, audio, video {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        article, aside, details, figcaption, figure,
+        footer, header, hgroup, menu, nav, section {
+            display: block;
+        }
+
+        body {
+            line-height: 1;
+        }
+
+        ol, ul {
+            list-style: none;
+        }
+
+        blockquote, q {
+            quotes: none;
+        }
+
+        blockquote:before, blockquote:after,
+        q:before, q:after {
+            content: '';
+            content: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        body {
+            background-color: #333;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0 !important;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        a:link, a:visited {
+            text-decoration: none;
+            color: #4383af;
+        }
+
+        a:hover, a:active {
+            text-decoration: underline;
+            color: #4383af;
+        }
+
+        select {
+            outline: none;
+        }
+
+        .container {
+            margin-left: auto;
+            margin-right: auto;
+            min-width: 100%;
+        }
+
+        .nav {
+            background-color: #101010;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            height: 60px;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: #DFDFDF;
+            height: 30px;
+            width: 88px;
+            border: 2px solid #DFDFDF;
+            border-radius: 5px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            line-height: 50%;
+        }
+
+        .btn:hover {
+            background-color: #e7e7e7;
+            color: #000;
+        }
+
+        .btn:focus {
+            outline: none;
+        }
+
+        .nav-btn-left {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+        }
+
+        .nav-center {
+            text-align: center;
+            position: fixed;
+            left: 50%;
+            top: 15px;
+            transform: translate(-50%, 0);
+            min-width: 500px;
+            margin: 0 10px 0 10px;
+        }
+
+        .btn-nb {
+            width: 44px;
+            margin-right: 5px;
+            float: left;
+            font-size: 20px;
+        }
+
+        .drop_list {
+            font-size: 15px;
+            text-align: center;
+            color: #DFDFDF;
+            background-color: #101010;
+            height: 30px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            float: left;
+        }
+
+        .nav-right {
+            position: fixed;
+            top: 15px;
+            right: 1%;
+            display: none;
+        }
+
+        .btn-x {
+            width: 44px;
+            margin-left: 5px;
+            float: left;
+        }
+
+        .entries {
+            min-width: 500px;
+            max-width: 1000px;
+            margin: 100px auto auto auto;
+
+        }
+
+        .entry {
+            min-height: 100px;
+            background-color: #101010;
+            border-radius: 5px;
+            opacity: 0.8;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding: 15px 15px 10px 15px;
+            position: relative;
+        }
+
+        .entry-header {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .entry-header a {
+            margin-right: 20px;
+        }
+
+        .plus {
+            color: #2a7017;
+            font-weight: bold;
+        }
+
+        .url-box {
+            font-size: 13px;
+            position: absolute;
+            top: 0;
+            right: 60px;
+            width: 200px;
+            max-height: 29px;
+            color: #4383af;
+            border: 2px solid #DFDFDF;
+            margin: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .check {
+            height: 29px;
+            width: 29px;
+            color: transparent;
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 10px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .check:hover {
+            background-color: #DFDFDF !important;
+            color: #101010 !important;
+        }
+
+        .underline {
+            width: 100%;
+            height: 1px;
+            background-color: #DFDFDF;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .entry-text {
+            float: left;
+            width: 78%;
+            margin: 5px;
+            text-align: justify;
+        }
+
+        .entry-media {
+            float: right;
+            width: 20%;
+            height: 100%;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .entry-media img {
+            width: 100%;
+        }
+
+        .hidden-media {
+            display: none;
+            cursor: pointer;
+        }
+
+        .border {
+            height: 120px;
+            line-height: 120px;
+            text-align: center;
+            border: 1px dashed #DFDFDF;
+            font-size: 12px;
+        }
+
+        .entry-footer {
+            height: 40px;
+        }
+
+        .comments-count {
+            float: right;
+            margin-right: 40px;
+            padding-top: 7px;
+        }
+
+        .arrow-down {
+            height: 29px;
+            width: 29px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 10px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: normal;
+        }
+
+        .comments {
+            display: none;
+        }
+
+        .comment {
+            max-width: 850px;
+            background-color: #101010;
+            border-radius: 5px;
+            opacity: 0.8;
+            margin: auto auto 15px auto;
+            padding: 15px 15px 10px 15px;
+            position: relative;
+        }
+
+        .url-box-com {
+            right: 5px !important;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        #tags_drop_list {
+            width: 325px;
+            margin-right: 15px;
+            margin-left: 10px;
+        }
+
+        #sort-btn {
+            font-size: 13px;
+        }
+
+        #picked-arrow {
+            color: #DFDFDF;
+            font-size: 30px;
+            position: absolute;
+            top: -100px;
+            right: 15%;
+        }
+
+        #toCopy {
+            position: absolute;
+            top: -100px;
+        }
+
+        #picked-count {
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            float: left;
+            margin-right: 10px;
+        }
+
+        #picked-entries {
+            float: left;
+            width: 160px;
+        }
+
+        #copyBtn {
+            float: left;
+            margin-left: 5px;
+        }
+
+        @media screen and (max-width: 1250px) {
+            .nav-center {
+                left: 30%;
+            }
+
+            .nav-btn-left {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        function imgLoadErr(ref) {
+            var outer = ref.parentNode;
+            var hiddeninfo = outer.parentNode.getElementsByClassName("hidden-media");
+            hiddeninfo[0].style.display = "block";
+            outer.remove(outer.selectedIndex);
+        }
+
+        function insertIMG(ref, url) {
+            var index = url.indexOf("gfycat.com");
+            if (index !== -1) {
+                var position = index + 10;
+                var new_url = [url.slice(0, position), '/ifr', url.slice(position)].join('');
+                ref.innerHTML = "<iframe src="+ new_url +" scrolling='no' frameborder='0' width='194' allowfullscreen>"
+            }
+            else {
+                ref.innerHTML = "<a href=" + url + "><img src=" + url + "></a>"
+            }
+        }
+
+        function showHide(obj) {
+            var comments = obj.parentNode.parentNode.parentNode.getElementsByClassName("comments")[0];
+            if (comments.style.display === "" || comments.style.display === "none") {
+                comments.style.display = "block";
+                obj.title = "Ukryj komentarze.";
+                obj.content = "shown";
+                obj.innerHTML = "&#8613;";
+            } else {
+                comments.style.display = "none";
+                obj.title = "Pokaż komentarze.";
+                obj.content = "hidden";
+                obj.innerHTML = "&#8615;";
+            }
+        }
+
+        function check(ref) {
+            var checkedIds = document.getElementById("checked-ids");
+            var id = ref.parentNode.parentNode.parentNode.id;
+            var opt;
+            var pickedCount;
+            var num;
+            if (ref.content === "unchecked" || ref.content === undefined) {
+                ref.style.backgroundColor = "#DFDFDF";
+                ref.style.color = "#101010";
+                ref.content = "checked";
+                opt = document.createElement("OPTION");
+                opt.value = id;
+                opt.innerHTML = id.slice(1);
+                checkedIds.getElementsByTagName("select")[0].appendChild(opt);
+                pickedCount = document.getElementById("picked-count");
+                num = parseInt(pickedCount.innerText) + 1;
+                pickedCount.value = num.toString();
+                pickedCount.innerHTML = num;
+                if (checkedIds.style.display === "none" || checkedIds.style.display === '') {
+                    checkedIds.style.display = "inline-block";
+                }
+            } else {
+                ref.style.backgroundColor = "transparent";
+                ref.style.color = "transparent";
+                ref.content = "unchecked";
+                opt = checkedIds.querySelector("OPTION[value=" + id + "]");
+                checkedIds.getElementsByTagName("select")[0].removeChild(opt);
+                pickedCount = document.getElementById("picked-count");
+                num = parseInt(pickedCount.innerText) - 1;
+                pickedCount.value = num.toString();
+                pickedCount.innerHTML = num;
+                var all = checkedIds.getElementsByTagName("OPTION");
+                if (all.length < 2) {
+                    checkedIds.style.display = "none";
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="nav">
+        <a href="https://github.com/kosior">
+            <button class="btn nav-btn-left">GitHub</button>
+        </a>
+        <div class="nav-center">
+            <button class="btn btn-nb" onclick="nextOrBack('next')">
+                &#8675;
+            </button>
+            <button class="btn btn-nb" onclick="nextOrBack('back')">
+                &#8673;
+            </button>
+            <select title="Wybierz tag." class="drop_list" id="tags_drop_list" onchange="choose(this)">
+                <option value="choose-all">--- wszystkie tagi ---</option>
+                {% for tag, number in tags %}
+                    <option value="{{ tag }}">{{ tag }} ({{ number }})</option>
+                {% endfor %}
+            </select>
+            <button title="Sortuj alfabetycznie." id="sort-btn" class="btn btn-nb" onclick="sortTags(this)">abc</button>
+            <button title="Pokaż lub ukryj wszystkie komentarze." class="btn btn-nb" name="show" onclick="showAllComments(this)">
+                &#8615;
+            </button>
+            <button title="zaznacz wszystkie widoczne wpisy" class="btn btn-nb" onclick="checkAllVisible()">
+                &#10003;
+            </button>
+        </div>
+
+        <div id="checked-ids" class="nav-right">
+            <div id="picked-count">0</div>
+            <select title="Wybrane wpisy." class="drop_list" id="picked-entries" onchange="goToEntry(this, true)">
+                <option value="topvalue" onclick="goToEntry(this, true)">--- wybrane wpisy ---</option>
+            </select>
+            <button title="Kopiuj do schowka." id="copyBtn" class="btn" onclick="copyToClipboard(this)">
+                Kopiuj
+            </button>
+            <button title="Odznacz wszystkie." class="btn btn-x" onclick="unCheckAll()">
+                &#10060;
+            </button>
+        </div>
+
+    </div>
+
+    <div id="picked-arrow">&#8612;</div>
+
+    <div class="entries">
+
+        {% for entry in entries %}
+
+        <div class="full-entry {{ entry.tags }}" id="e{{ entry.id_ }}">
+            <div class="entry">
+                <div class="entry-header">
+                    <a href="http://www.wykop.pl/ludzie/{{ entry.author }}">{{ entry.author }}</a>
+                    <a href="http://www.wykop.pl/wpis/{{ entry.id_ }}">{{ entry.date }}</a>
+                    <span class="plus">+{{ entry.plus }}</span>
+
+                    {% if entry.media_url %}
+                        <div class="url-box">
+                            <a href="{{ entry.media_url }}" title="{{ entry.media_url }}">{{ entry.media_url }}</a>
+                        </div>
+                    {% endif %}
+
+                    <button content="unchecked" class="btn check" onclick="check(this)">
+                        &#10003;
+                    </button>
+
+                    <div class="underline"></div>
+                </div>
+
+                <div class="entry-body">
+                    <div class="entry-text">
+                        {{ entry.body_html }}
+                    </div>
+                    <div class="entry-media">
+                        {% if entry.media_url %}
+                            {% set entry_media_local_path = entry.local_file_path %}
+                            {% if entry_media_local_path %}
+                                <div class="hidden-media" onclick="insertIMG(this, '{{ entry.media_url }}')">
+                                    <div class="border">
+                                        Kliknij, aby załadować obraz.
+                                    </div>
+                                </div>
+                                {% if '.webm' in entry_media_local_path %}
+                                    <video width="194" controls>
+                                        <source src="{{ entry_media_local_path}}" onerror="imgLoadErr(this)" type="video/webm">
+                                    </video>
+                                {% else %}
+                                    <a href="{{ entry_media_local_path }}">
+                                        <img src="{{ entry_media_local_path }}" onerror="imgLoadErr(this)">
+                                    </a>
+                                {% endif %}
+                            {% elif 'youtube' in entry.media_url %}
+                                <iframe width="194" src="{{ entry.media_url|replace('watch?v=', 'embed/') }}" frameborder="0" allowfullscreen></iframe>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="entry-footer">
+                    <div class="underline"></div>
+                    <div class="comments-count">
+                        komentarzy:
+                        {{ entry.comments_count }}
+                    </div>
+                    {% if entry.comments_count %}
+                        <button class="btn arrow-down" title="Pokaż komentarze." onclick="showHide(this)">
+                            &#8615;
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="comments">
+                {% for comment in entry.comments %}
+                <div class="comment">
+                    <div class="entry-header">
+                        <a href="http://www.wykop.pl/ludzie/{{ entry.author }}">{{ comment.author }}</a>
+                        <a href="http://www.wykop.pl/wpis/{{ entry.id_ }}/#comment-{{ comment.id_ }}">{{ comment.date}}</a>
+                        <span class="plus">+{{ comment.plus }}</span>
+
+                        {% if comment.media_url %}
+                        <div class="url-box url-box-com">
+                            <a href="{{ comment.media_url }}" title="{{ comment.media_url }}">{{ comment.media_url}}</a>
+                        </div>
+                        {% endif %}
+                        <div class="underline"></div>
+                    </div>
+
+                    <div class="entry-body">
+                        <div class="entry-text">
+                            {{ comment.body_html }}
+                        </div>
+                        <div class="entry-media">
+                            {% if comment.media_url %}
+                            {% set comment_media_local_path = comment.local_file_path %}
+                            {% if comment_media_local_path %}
+                            <div class="hidden-media" onclick="insertIMG(this, '{{ comment.media_url }}')">
+                                <div class="border">
+                                    Kliknij, aby załadować obraz.
+                                </div>
+                            </div>
+                                {% if '.webm' in comment_media_local_path %}
+                                    <video width="194" controls>
+                                        <source src="{{ comment_media_local_path}}" onerror="imgLoadErr(this)" type="video/webm">
+                                    </video>
+                                {% else %}
+                                    <a href="{{ comment_media_local_path }}">
+                                        <img src="{{ comment_media_local_path }}" onerror="imgLoadErr(this)">
+                                    </a>
+                                {% endif %}
+                            {% elif 'youtube' in comment.media_url %}
+                            <iframe width="174" src="{{ comment.media_url|replace('watch?v=', 'embed/') }}" frameborder="0" allowfullscreen></iframe>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <input title="This id's will be copied to clipboard." type="text" id="toCopy" value="">
+</div>
+
+<script>
+    var all_entries = document.getElementsByClassName("full-entry");
+
+    function isVisible(value) {
+        return !(value.style.display === "none");
+    }
+
+    function resetPickedArrow() {
+        var arrow = document.getElementById("picked-arrow");
+        arrow.style.top = -100 + "px";
+        step = -1;
+    }
+
+    function choose(ref) {
+        resetPickedArrow();
+        var i;
+        var tag_picked = ref.value;
+        if (tag_picked === 'choose-all') {
+            for (i = 0; i < all_entries.length; i++) {
+                all_entries[i].style.display = "block";
+            }
+        }
+        else {
+            for (i = 0; i < all_entries.length; i++) {
+                if (all_entries[i].classList.contains(tag_picked)) {
+                    all_entries[i].style.display = "block";
+                }
+                else {
+                    all_entries[i].style.display = "none";
+                }
+            }
+        }
+        window.scrollTo(0, 0);
+    }
+
+    var currentList = [];
+    var wantedList = [];
+
+    function sortTags(ref) {
+        var drop_list = document.getElementById("tags_drop_list");
+        var options = drop_list.options;
+        var i;
+
+        if (ref.innerHTML === "abc") {
+            ref.innerHTML = "123";
+            ref.title = "Sortuj po ilości wpisów.";
+        }
+        else {
+            ref.innerHTML = "abc";
+            ref.title = "Sortuj alfabetycznie.";
+        }
+
+        if (currentList.length < 1) {
+            for (i = 1; i < options.length; i++) {
+                currentList[i - 1] = [];
+                currentList[i - 1][0] = options[i].text;
+                currentList[i - 1][1] = options[i].value;
+            }
+            wantedList = currentList.slice(0);
+            wantedList.sort();
+        }
+
+        while (options.length > 1) {
+            options[1] = null;
+        }
+
+        for (i = 0; i < wantedList.length; i++) {
+            options[i + 1] = new Option(wantedList[i][0], wantedList[i][1])
+        }
+
+        wantedList = [currentList, currentList = wantedList][0];
+    }
+
+    function copyToClipboard(ref) {
+        var i;
+        var inputToCopy = document.getElementById("toCopy");
+        var pickedEntries = document.getElementById("picked-entries").getElementsByTagName("option");
+
+        inputToCopy.value = "";
+
+        for (i = 1; i < pickedEntries.length; i++) {
+            inputToCopy.value = inputToCopy.value + pickedEntries[i].innerHTML + " ";
+        }
+
+        inputToCopy.select();
+        document.execCommand("copy");
+        ref.innerHTML = "";
+        setTimeout(function () {
+            ref.innerHTML = "Kopiuj";
+        }, 1000);
+    }
+
+    var step = -1;
+
+    function nextOrBack(pick) {
+        var entries = getAllVisibleEntries();
+        var entry;
+        if (pick === "next") {
+            if (!(step === (entries.length - 1))) {
+                step++;
+                entry = entries[step];
+                entry.value = entry.id;
+                goToEntry(entry);
+            }
+        }
+        else if (pick === "back") {
+            if (!(step <= 0)) {
+                step--;
+                entry = entries[step];
+                entry.value = entry.id;
+                goToEntry(entry);
+            }
+        }
+    }
+
+    function showAllComments(ref) {
+        var arrows = document.getElementsByClassName("arrow-down");
+        var action = ref.name;
+        if (action === 'show') {
+            ref.name = 'hide';
+            action = 'Pokaż komentarze.';
+            ref.innerHTML = "&#8613;";
+        }
+        else if (action === 'hide') {
+            ref.name = 'show';
+            action = 'Ukryj komentarze.';
+            resetPickedArrow();
+            ref.innerHTML = "&#8615;";
+        }
+
+        for (var i = 0; i < arrows.length; i++) {
+            if (arrows[i].title === action) {
+                showHide(arrows[i]);
+            }
+        }
+    }
+
+    function findPos(obj) {
+        var curtop = 0;
+        if (obj.offsetParent) {
+            do {
+                curtop += obj.offsetTop;
+            } while (obj = obj.offsetParent);
+            return curtop;
+        }
+    }
+
+    function goToEntry(ref, clear=false) {
+        if (clear) {
+            step = -1;
+        }
+        var pick = ref.value;
+        var picked = document.getElementById("picked-arrow");
+
+        if (pick === "topvalue") {
+            window.scrollTo(0, 0);
+            picked.style.top = -100 + "px";
+        }
+        else {
+            var pos = findPos(document.getElementById(pick));
+            if (pos === undefined) {
+                ref.selectedIndex = 0;
+                picked.style.top = -100 + "px";
+                return;
+            }
+            window.scrollTo(0, pos - 80);
+            picked.style.position = "absolute";
+            pos = pos + 5;
+            picked.style.top = pos + "px";
+        }
+    }
+
+    function getAllVisibleEntries() {
+        var entries = Array.from(document.getElementsByClassName("full-entry"));
+        return entries.filter(isVisible);
+    }
+
+    function checkAllVisible() {
+        var entries = getAllVisibleEntries();
+        var divCheck;
+        for (var i = 0; i < entries.length; i++) {
+            divCheck = entries[i].getElementsByClassName("check")[0];
+            if (divCheck.content === "unchecked" || divCheck.content === undefined) {
+                check(divCheck);
+            }
+        }
+    }
+
+    function unCheckAll() {
+        var divCheck;
+        var id;
+        var dropList = document.getElementById("picked-entries");
+        var options = dropList.getElementsByTagName("option");
+
+        while (options.length > 1) {
+            id = options[1].value;
+            divCheck = document.getElementById(id).getElementsByClassName("check")[0];
+            check(divCheck);
+        }
+    }
+
+    (function () {
+        var nav = document.getElementsByClassName("nav")[0];
+        nav.style.opacity = 0.95;
+        nav.style.pointerEvents = "auto";
+    })();
+</script>
+</body>
+</html>
