@@ -1,24 +1,25 @@
 import logging
 import os
 import platform
-import shutil
 import stat
 import tempfile
 import traceback
 
 from . import settings
 from .request import Request
-from .utils import Decision
+from .save import Save
+from .utils import Decision, unpack_archive
 
 
 class SeleniumDriver:
     msg = '''Wystąpił problem ze sterownikiem przeglądarki
         Zaktualizuj przeglądarkę.
-        Pobierz najnowszy sterownik ręcznie i rozpakuj:
+        Pobierz najnowszy sterownik ręcznie i rozpakuj do folderu seleniumdrivers:
              firefox: https://github.com/mozilla/geckodriver/releases
              chrome: https://sites.google.com/a/chromium.org/chromedriver/downloads'''
 
-    def __init__(self, browser, file_name, sfx, driver_url=None, folder_path=None):
+    def __init__(self, browser, file_name, sfx, driver_url=None, folder_path=None,
+                 save_file_func=None):
         self.browser = browser
         self.file_name = file_name
         self.sfx = sfx
@@ -26,6 +27,7 @@ class SeleniumDriver:
         self.folder_path = folder_path or os.path.join(settings.BASE_DIR,
                                                        settings.SELENIUM_DRIVER_DIR_NAME)
         self.download_url = None
+        self.save_file_func = save_file_func or Save.save_single_file
 
     def get_download_url(self):
         raise NotImplementedError
@@ -53,41 +55,22 @@ class SeleniumDriver:
             return 'zip'
         return None
 
-    def unpack(self, content, fmt):
-        ext = os.path.splitext(self.download_url)[1]
-        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tp:
-            file = tp.name
-            tp.write(content)
-        try:
-            shutil.unpack_archive(file, extract_dir=self.folder_path, format=fmt)
-        except (ValueError, OSError) as err:
-            logging.debug(traceback.format_exc())
-            logging.critical(err)
-            print(self.msg)
-            raise SystemExit
-        finally:
-            os.remove(file)
-
     @staticmethod
     def make_executable(driver_path):
         st = os.stat(driver_path)
         os.chmod(driver_path, st.st_mode | stat.S_IEXEC)
 
-    def get_url_content(self, url):
-        response = Request.get(url, exit_=True, msg=self.msg)
-        try:
-            return response.content
-        except AttributeError as err:
-            logging.debug(traceback.format_exc())
-            logging.critical(err)
-            raise SystemExit
-
     def download_and_unpack(self):
         fmt = self.get_format(self.download_url)
-        logging.info('...pobieranie')
-        content = self.get_url_content(self.download_url)
-        logging.info('...rozpakowywanie')
-        self.unpack(content, fmt)
+        with tempfile.TemporaryDirectory() as tempdir:
+            file_name = self.download_url.rsplit('/', 1)[-1]
+            full_path = os.path.join(tempdir, file_name)
+            logging.info('...pobieranie sterownika')
+            if not self.save_file_func(self.download_url, full_path):
+                logging.CRITICAL(self.msg)
+                raise SystemExit
+            logging.info('...rozpakowywanie archiwum')
+            unpack_archive(full_path, self.folder_path, fmt, self.msg)
 
     def choose(self):
         msg = '{}\nChcesz pobrać powyższy plik? (T/n): '.format(self.download_url)
@@ -103,6 +86,8 @@ class SeleniumDriver:
 
     def prepare(self):
         if not self.set_driver_path():
+            if not os.path.exists(self.folder_path):
+                os.makedirs(self.folder_path, exist_ok=True)
             self.get_driver()
 
 
