@@ -9,10 +9,11 @@ except ImportError:
     logging.debug('ImportError - pip - ' + __file__)
 
 from .abs_base import AbsCommand
-from .. import settings
+from .. import __version__, settings
 from ..auth import is_key_valid
 from ..db import database_list, DB
 from ..entrygenerators import APIMethod, ScrapeMethod
+from ..request import Request
 from ..strategies import APIStrategy, SessionStrategy
 from ..utils import Decision
 
@@ -110,8 +111,23 @@ class CreateFolders(AbsCommand):
 class CheckForUpdate(AbsCommand):
     name = 'CheckForUpdate'
 
+    def __init__(self):
+        self.local_version = __version__
+        self.github_url = settings.GITHUB_URL
+
     def execute(self, *args):
-        pass
+        logging.info('...sprawdzanie aktualizacji')
+        settings.IS_UPDATE = self.is_new_version()
+
+    def get_github_version(self):
+        response = Request.get(self.github_url, msg='Wystąpił problem ze sprawdzaniem aktualizacji')
+        try:
+            return response.url.rsplit('/', 1)[-1]
+        except AttributeError:
+            return ''
+
+    def is_new_version(self):
+        return self.get_github_version() > self.local_version
 
 
 class UpdateCommand(AbsCommand):
