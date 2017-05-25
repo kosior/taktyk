@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import traceback
 
 from .settings import BASE_DIR
@@ -112,3 +113,13 @@ class Decision:
             else:
                 msg = 'Zły wybór! Wybierz jeszcze raz.'
                 logging.error(msg)
+
+
+def unpack_archive(file, extract_dir, format_, msg):
+    try:
+        shutil.unpack_archive(file, extract_dir=extract_dir, format=format_)
+    except (ValueError, OSError) as err:
+        logging.debug(traceback.format_exc())
+        logging.critical(err)
+        logging.critical(msg)
+        raise SystemExit
