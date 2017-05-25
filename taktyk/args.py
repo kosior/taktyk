@@ -27,15 +27,18 @@ def _parse(static_args=None):
     parser.add_argument('-n', '--nsfw', help='włącz ignorowanie wpisów nsfw', action='store_true')
     parser.add_argument('--CreateFolders', help=argparse.SUPPRESS, default=True)
     parser.add_argument('--CheckForUpdate', help=argparse.SUPPRESS, default=True)
-    group.add_argument('-u', '--update', help='aktualizacja programu', action='store_true', default='notify')
+    group.add_argument('-u', '--update', help='aktualizacja programu', action='store_true')
 
     parser.add_argument('--new', help='utwórz nową bazę danych', action='store_true')
     parser.add_argument('-p', '--pdk', help='podaj userkey', action='store_true')
 
-    group.add_argument('-f', '--file', help='podaj ścieżkę do pliku tekstowego lub folderu z numerami wpisów', action='store_true')
+    group.add_argument('-f', '--file', help='podaj ścieżkę do pliku tekstowego lub folderu',
+                       action='store_true')
     group.add_argument('-i', '--ids', help='podaj numery wpisów', action='store_true')
-    group.add_argument('-s', '--selenium', help='użyj selenium, aby pobrać numery wpisów', choices=['firefox', 'chrome'])
-    group.add_argument('-S', '--session', help='użyj requests.Session, aby pobrać numery wpisów', action='store_true')
+    group.add_argument('-s', '--selenium', help='użyj selenium, aby pobrać numery wpisów',
+                       choices=['firefox', 'chrome'])
+    group.add_argument('-S', '--session', help='użyj requests.Session, aby pobrać numery wpisów',
+                       action='store_true')
     group.add_argument('-d', '--delete', help='usuwanie wpisów z wybranego zasięgu',
                        choices=['db', 'wykop', 'all'])
 
@@ -45,7 +48,8 @@ def _parse(static_args=None):
 
     group.add_argument('--html', help='utwórz ponownie plik html', action='store_true')
     group.add_argument('--save', help='pobierz pliki z wpisów z bazy danych', action='store_true')
-    group.add_argument('-c', '--comments', help='zaktualizuj komentarze we wpisach', action='store_true')
+    group.add_argument('-c', '--comments', help='zaktualizuj komentarze we wpisach',
+                       action='store_true')
 
     args = parser.parse_args(static_args, OrderedNamespace())
     return args.ordered

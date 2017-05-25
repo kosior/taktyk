@@ -42,7 +42,8 @@ SELENIUM_DRIVER_URLS = {
     'firefox': 'https://github.com/mozilla/geckodriver/releases'
 }
 
-GITHUB_URL = 'https://github.com/kosior/taktyk/releases/latest'
+GITHUB_MASTER_ZIP_URL = 'https://github.com/kosior/taktyk/archive/master.zip'
+GITHUB_LATEST_RELEASE_URL = 'https://github.com/kosior/taktyk/releases/latest'
 GFYCAT_API = 'https://gfycat.com/cajax/get/'
 
 # Directories:
@@ -80,7 +81,6 @@ SKIP_FILES = False
 BROWSER = None
 NSFW_FILTER = False
 DB_IDS = []
-IS_UPDATE = False
 
 # for tracking how many entries and comments were added:
 ENTRIES_ADDED = 0

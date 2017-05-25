@@ -1,7 +1,10 @@
 import importlib
 import logging
 import os
+import shutil
 import sys
+import tempfile
+from distutils.dir_util import copy_tree
 
 try:
     import pip
@@ -14,8 +17,9 @@ from ..auth import is_key_valid
 from ..db import database_list, DB
 from ..entrygenerators import APIMethod, ScrapeMethod
 from ..request import Request
+from ..save import Save
 from ..strategies import APIStrategy, SessionStrategy
-from ..utils import Decision
+from ..utils import Decision, unpack_archive
 
 
 class ConfigureCommand(AbsCommand):
@@ -113,14 +117,18 @@ class CheckForUpdate(AbsCommand):
 
     def __init__(self):
         self.local_version = __version__
-        self.github_url = settings.GITHUB_URL
+        self.latest_release_url = settings.GITHUB_LATEST_RELEASE_URL
 
     def execute(self, *args):
         logging.info('...sprawdzanie aktualizacji')
-        settings.IS_UPDATE = self.is_new_version()
+        if self.is_new_version():
+            self.notify()
+        else:
+            logging.info('...brak aktualizacji')
 
     def get_github_version(self):
-        response = Request.get(self.github_url, msg='Wystąpił problem ze sprawdzaniem aktualizacji')
+        response = Request.get(self.latest_release_url,
+                               msg='Wystąpił problem ze sprawdzaniem aktualizacji')
         try:
             return response.url.rsplit('/', 1)[-1]
         except AttributeError:
@@ -129,12 +137,52 @@ class CheckForUpdate(AbsCommand):
     def is_new_version(self):
         return self.get_github_version() > self.local_version
 
+    @staticmethod
+    def notify():
+        print('\n-------  Aktualizacja jest dostępna  -------\n'
+              '--  Aby zaktualizować użyj parametru: -u  --\n')
+
 
 class UpdateCommand(AbsCommand):
     name = 'update'
 
+    msg_err = 'Wystąpił problem z aktualizacją. Spróbuj ponownie lub pobierz samodzielnie.'
+
+    def __init__(self):
+        self.master_zip_url = settings.GITHUB_MASTER_ZIP_URL
+        self.selenium_drivers_path = os.path.join(settings.BASE_DIR,
+                                                  settings.SELENIUM_DRIVER_DIR_NAME)
+        self.save_file = Save.save_single_file
+        self.base_dir = settings.BASE_DIR
+        _, self.file_name = os.path.split(self.master_zip_url)
+
     def execute(self, arg, *args):
-        pass
+        logging.warning('Wcześniej pobrane sterowniki przeglądarki zostaną usunięte.')
+        if self.choose():
+            self.save_and_unpack()
+            self.delete_selenium_driver_files()
+            logging.info('...aktualizacja przebiegła pomyślnie')
+        exit()
+
+    def choose(self):
+        msg = '{}\nChcesz pobrać powyższy plik i kontunuować aktualizację? ' \
+              '(T/n): '.format(self.master_zip_url)
+        dec = Decision(msg, {'T': True, 'n': exit})
+        return dec.run()
+
+    def save_and_unpack(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            full_path = os.path.join(tempdir, self.file_name)
+            if not self.save_file(self.master_zip_url, full_path):
+                logging.CRITICAL(self.msg_err)
+                raise SystemExit
+            unpack_archive(full_path, tempdir, 'zip', self.msg_err)
+            taktyk_path = os.path.join(tempdir, 'taktyk-master', 'taktyk')
+            copy_tree(taktyk_path, self.base_dir)
+
+    def delete_selenium_driver_files(self):
+        if os.path.exists(self.selenium_drivers_path):
+            shutil.rmtree(self.selenium_drivers_path)
 
 
 class DBHandler(AbsCommand):
