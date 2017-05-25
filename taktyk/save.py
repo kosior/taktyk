@@ -73,7 +73,6 @@ class Save:
 
     @staticmethod
     def save_single_file(url, full_path, msg=''):
-        msg = msg + url
         response = Request.get(url, exit_=False, msg=msg, stream=True)
         try:
             response_gen = response.iter_content(1024)
