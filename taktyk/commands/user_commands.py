@@ -1,4 +1,8 @@
 import logging
+import os
+import shutil
+import tempfile
+from distutils.dir_util import copy_tree
 
 from .abs_base import AbsCommand
 from .validators import userkey_validator, source_validator, ids_validator
@@ -7,9 +11,9 @@ from ..db import DB
 from ..entrygenerators import ScrapeMethod
 from ..render import HtmlFile
 from ..request import Request
-from ..save import Multi, save_wrapper
+from ..save import Multi, Save, save_wrapper
 from ..strategies import SourceStrategy, SessionStrategy, APIStrategy, SeleniumStrategy
-from ..utils import Decision
+from ..utils import Decision, unpack_archive
 
 
 class NewCommand(AbsCommand):
@@ -167,3 +171,45 @@ class IdsCommand(AbsCommand):
         ids = Decision(msg, {'0': exit}, validator=ids_validator).run()
         settings.SOURCE = {'ids': ids}
         settings.STRATEGY = SourceStrategy
+
+
+class UpdateCommand(AbsCommand):
+    name = 'update'
+
+    msg_err = 'Wystąpił problem z aktualizacją. Spróbuj ponownie lub pobierz samodzielnie.'
+
+    def __init__(self):
+        self.master_zip_url = settings.GITHUB_MASTER_ZIP_URL
+        self.selenium_drivers_path = os.path.join(settings.BASE_DIR,
+                                                  settings.SELENIUM_DRIVER_DIR_NAME)
+        self.save_file = Save.save_single_file
+        self.base_dir = settings.BASE_DIR
+        _, self.file_name = os.path.split(self.master_zip_url)
+
+    def execute(self, arg, *args):
+        logging.warning('Wcześniej pobrane sterowniki przeglądarki zostaną usunięte.')
+        if self.choose():
+            self.save_and_unpack()
+            self.delete_selenium_driver_files()
+            logging.info('...aktualizacja przebiegła pomyślnie')
+        exit()
+
+    def choose(self):
+        msg = '{}\nChcesz pobrać powyższy plik i kontunuować aktualizację? ' \
+              '(T/n): '.format(self.master_zip_url)
+        dec = Decision(msg, {'T': True, 'n': exit})
+        return dec.run()
+
+    def save_and_unpack(self):
+        with tempfile.TemporaryDirectory() as tempdir:
+            full_path = os.path.join(tempdir, self.file_name)
+            if not self.save_file(self.master_zip_url, full_path):
+                logging.CRITICAL(self.msg_err)
+                raise SystemExit
+            unpack_archive(full_path, tempdir, 'zip', self.msg_err)
+            taktyk_path = os.path.join(tempdir, 'taktyk-master', 'taktyk')
+            copy_tree(taktyk_path, self.base_dir)
+
+    def delete_selenium_driver_files(self):
+        if os.path.exists(self.selenium_drivers_path):
+            shutil.rmtree(self.selenium_drivers_path)
