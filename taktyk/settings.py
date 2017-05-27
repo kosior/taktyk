@@ -9,7 +9,7 @@ SECRETKEY = None
 ACCOUNTKEY = None
 USERKEY = None
 
-STATIC_ARGS = []  # here you can set default args e.g. ['-f', '-c', '--skip']
+STATIC_ARGS = []  # here you can set default args e.g. ['-s', 'chrome', '--skip']
 
 # files with this exts will be downloaded (.webm for gfycat)
 EXTS = ('.gif', '.jpg', '.jpeg', '.png', '.webm')
@@ -17,6 +17,7 @@ EXTS = ('.gif', '.jpg', '.jpeg', '.png', '.webm')
 DB_NAME = 'taktyk.db'
 TEMPLATE_NAME = 'template.html'
 USERKEY_FILE = 'userkey.txt'
+CONFIG_FILE = 'config.ini'
 
 # URLS (here are all urls used in this script):
 # used in auth.py:

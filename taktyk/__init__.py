@@ -16,7 +16,7 @@ from .args import process_args
 from .db import DB
 from .render import HtmlFile
 from .save import Multi, save_wrapper
-from .utils import configure_logging, ex_hook
+from .utils import configure_logging, ex_hook, ConfigFile
 
 
 def pipeline(strategy, method):
@@ -45,6 +45,7 @@ def main():
     signal.signal(signal.SIGINT, lambda s, f: sys.exit(''))  # handling KeyboardInterrupt
     sys.excepthook = ex_hook  # creating hook for uncaught exceptions
     configure_logging()
+    ConfigFile().set_up()
     process_args(settings.STATIC_ARGS)
     pipeline(settings.STRATEGY, settings.METHOD)
     HtmlFile().create()

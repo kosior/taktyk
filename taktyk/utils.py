@@ -1,9 +1,10 @@
+import configparser
 import logging
 import os
 import shutil
 import traceback
 
-from .settings import BASE_DIR
+from . import settings
 
 
 class CustomFormatter(logging.Formatter):
@@ -26,7 +27,7 @@ class CustomFormatter(logging.Formatter):
 
 
 def configure_logging():
-    log_file_path = os.path.join(BASE_DIR, 'taktyk.log')
+    log_file_path = os.path.join(settings.BASE_DIR, 'taktyk.log')
 
     def get_save_mode(path):
         if os.path.isfile(path) and os.path.getsize(path) > 1048576:
@@ -123,3 +124,51 @@ def unpack_archive(file, extract_dir, format_, msg):
         logging.critical(err)
         logging.critical(msg)
         raise SystemExit
+
+
+class ConfigFile:
+    str_config = """
+    [DANE LOGOWANIA]
+    username =
+    password =
+
+    [WykopApi]
+    appkey =
+    secretkey =
+    accountkey =
+    # opcjonalnie:
+    userkey =
+
+    [ARGUMENTY]
+    # przykład: static_args = -s chrome --skip -n
+    static_args =
+
+    [POBIERANE ROZSZERZENIA]
+    exts = .gif .jpg .jpeg .png .webm
+    """
+
+    def __init__(self):
+        self.file_path = os.path.join(settings.USER_FILES_PATH, settings.CONFIG_FILE)
+
+    def create_configfile(self):
+        config = configparser.ConfigParser()
+        config.read_string(self.str_config)
+        with open(self.file_path, 'w') as configfile:
+            config.write(configfile)
+
+    def read_and_apply_config(self):
+        config = configparser.ConfigParser()
+        config.read(self.file_path)
+        for section in config.sections():
+            for option in config[section]:
+                value = config.get(section, option)
+                if value:
+                    if option in ('static_args', 'exts'):
+                        value = value.split(' ')
+                    setattr(settings, option.upper(), value)
+
+    def set_up(self):
+        if os.path.isfile(self.file_path):
+            self.read_and_apply_config()
+        else:
+            self.create_configfile()
