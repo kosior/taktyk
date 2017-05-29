@@ -148,7 +148,7 @@ class ConfigFile:
     """
 
     def __init__(self):
-        self.file_path = os.path.join(settings.USER_FILES_PATH, settings.CONFIG_FILE)
+        self.file_path = os.path.join(settings.BASE_DIR, settings.CONFIG_FILE)
 
     def create_configfile(self):
         config = configparser.ConfigParser()
