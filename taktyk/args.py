@@ -46,7 +46,9 @@ def _parse(static_args=None):
     parser.add_argument('--scrape', help='włącz tryb scrapowania', action='store_true')
     parser.add_argument('--DBHandler', help=argparse.SUPPRESS, default=True)
 
-    group.add_argument('--html', help='utwórz ponownie plik html', action='store_true')
+    group.add_argument('--html', help='utwórz ponownie plik html. '
+                       'Opcjonalnie możesz podać tag, do którego zostaną ograniczone wpisy.',
+                       default=False, nargs='?', const=True)
     group.add_argument('--save', help='pobierz pliki z wpisów z bazy danych', action='store_true')
     group.add_argument('-c', '--comments', help='zaktualizuj komentarze we wpisach',
                        action='store_true')

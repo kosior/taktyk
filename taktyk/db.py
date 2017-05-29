@@ -118,17 +118,13 @@ class DB:
             set_added_info(obj.type_)
             return True
 
-    @staticmethod
+    @classmethod
     @connect()
-    def get_ids(cursor, table: '"entry" or "entry_comment"'):
-        nsfw_condition = ''
-        if settings.NSFW_FILTER:
-            nsfw_condition = 'WHERE is_nsfw = 0'
-
-        statement = 'SELECT id FROM {} {} ORDER BY date DESC'.format(table, nsfw_condition)
-
+    def get_ids(cls, cursor, table: '"entry" or "entry_comment"', tag=None):
+        condition, params = cls.get_condition_and_params(tag)
+        statement = 'SELECT id FROM {} {} ORDER BY date DESC'.format(table, condition)
         try:
-            return [row[0] for row in cursor.execute(statement).fetchall()]
+            return [row[0] for row in cursor.execute(statement, params).fetchall()]
         except sqlite3.IntegrityError:
             logging.debug('Fetching ids failed')
 
@@ -170,23 +166,23 @@ class DB:
 
     @classmethod
     @connect()
-    def get_all_entries_with_comments(cls, cursor):
-        return (cls.get_entry_with_comments(id_) for id_ in cls.get_ids(cursor, 'entry'))
+    def get_all_entries_with_comments(cls, cursor, tag=None):
+        return (cls.get_entry_with_comments(id_) for id_ in cls.get_ids(cursor, 'entry', tag=tag))
 
-    @staticmethod
+    @classmethod
     @connect()
-    def count_tags(cursor):
+    def count_tags(cls, cursor, arg_tag=None):
         tags_dict = {}
-
-        statement = 'SELECT tags FROM entry'
+        condition, params = cls.get_condition_and_params(arg_tag)
+        statement = 'SELECT tags FROM entry {}'.format(condition)
         try:
-            tags = cursor.execute(statement).fetchall()
+            tags = cursor.execute(statement, params).fetchall()
         except sqlite3.IntegrityError:
             logging.debug('Fetching tags failed')
             return
 
         for tags_row in tags:
-            tags = tags_row[0].split(' ')
+            tags = set(tags_row[0].split(' '))
             for tag in tags:
                 if tag in tags_dict.keys():
                     tags_dict[tag] += 1
@@ -216,6 +212,22 @@ class DB:
             logging.debug(traceback.format_exc())
         else:
             return len(comments_ids)
+
+    @staticmethod
+    def get_condition_and_params(tag):
+        condition = ''
+        params = {}
+        if settings.NSFW_FILTER:
+            params['nsfw'] = 0
+            condition = 'WHERE is_nsfw = :nsfw'
+        if tag:
+            params['tag'] = '% {} %'.format(tag)
+            tag_condition = 'tags LIKE :tag'
+            if condition:
+                condition += ' AND {}'.format(tag_condition)
+            else:
+                condition = 'WHERE {}'.format(tag_condition)
+        return condition, params
 
 
 def database_list(path):
