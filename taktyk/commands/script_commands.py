@@ -30,6 +30,9 @@ class ConfigureCommand(AbsCommand):
             settings.STRATEGY = APIStrategy
             settings.METHOD = APIMethod
         else:
+            logging.warning('Wystąpił problem z Wykop API. Program przełączy się na tryb scrapowania.')
+            logging.warning('Problem mógł być spowodowany wprowadzeniem zmian w pliku config.ini.')
+            settings.SCRAPE = True
             settings.STRATEGY = SessionStrategy
             settings.METHOD = ScrapeMethod
 
