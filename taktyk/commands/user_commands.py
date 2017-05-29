@@ -106,8 +106,9 @@ class DeleteCommand(AbsCommand):
 class HtmlCommand(AbsCommand):
     name = 'html'
 
-    def execute(self, *args):
-        HtmlFile().create()
+    def execute(self, arg, *args):
+        arg = arg if arg is not True else None
+        HtmlFile(tag=arg).create()
         exit()
 
 

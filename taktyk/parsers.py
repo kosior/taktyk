@@ -49,9 +49,9 @@ class JsonParser:
         self.entry.body_html = body_html
         self.entry.body = ''.join(body.find_all(text=True))
         if tags:
-            self.entry.tags = ' '.join(tags)
+            self.entry.tags = ' {} '.format(' '.join(tags))
         else:
-            self.entry.tags = '#'
+            self.entry.tags = ' # '
 
     def _parse_nsfw(self, json_, tags):
         self.entry.is_nsfw = False
@@ -132,8 +132,8 @@ class SingleEntryHtmlParser:
         tags = self.entry_tag.find(class_='text').find_all(class_='showTagSummary')
         tags = [tag.get_text() for tag in tags]
         if tags:
-            return ' '.join(tags)
-        return '#'
+            return ' {} '.format(' '.join(tags))
+        return ' # '
 
     def get_is_nsfw(self):
         if self.entry_tag.find(class_='plus18item'):

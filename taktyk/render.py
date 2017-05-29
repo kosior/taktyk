@@ -12,7 +12,8 @@ from .db import DB
 
 
 class HtmlFile:
-    def __init__(self):
+    def __init__(self, tag=None):
+        self.tag = tag
         self.user_files_path = settings.USER_FILES_PATH
         self.templates_path = settings.TEMPLATES_PATH
         self.template_name = settings.TEMPLATE_NAME
@@ -44,8 +45,8 @@ class HtmlFile:
     def create(self):
         logging.info('...tworzenie pliku html')
         with DB.Connect() as cursor:
-            tags = DB.count_tags(cursor)
-            entries = DB.get_all_entries_with_comments(cursor)
+            tags = DB.count_tags(cursor, self.tag)
+            entries = DB.get_all_entries_with_comments(cursor, self.tag)
             rendered_bytes = self.render(tags, entries)
             self.save(rendered_bytes)
         logging.info('...utworzono plik html: %s', self.file_name)
