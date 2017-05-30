@@ -20,10 +20,7 @@ class NewCommand(AbsCommand):
     name = 'new'
 
     def execute(self, *args):
-        msg = 'Podaj nazwę dla bazy danych (0 - aby wyjść): '
-        name = Decision(msg, {'0': exit}, validator=lambda x: x).run()
-        DB.create_new(name.strip())
-        logging.info('...utworzono nową bazę danych: ' + settings.DB_NAME)
+        DB.ask_and_create()
 
 
 class PdkCommand(AbsCommand):

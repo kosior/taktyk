@@ -7,6 +7,7 @@ from contextlib import ContextDecorator
 
 from . import settings
 from .entry import Entry
+from .utils import Decision
 
 
 class DB:
@@ -20,6 +21,13 @@ class DB:
         else:
             settings.DB_NAME = 'taktyk-{}.db'.format(time.strftime('%Y%m%d%H%M%S'))
         cls.create()
+
+    @classmethod
+    def ask_and_create(cls):
+        msg = 'Podaj nazwę dla bazy danych (0 - aby wyjść): '
+        name = Decision(msg, {'0': exit}, validator=lambda x: x).run()
+        cls.create_new(name.strip())
+        logging.info('...utworzono nową bazę danych: ' + settings.DB_NAME)
 
     class Connect(ContextDecorator):
         def __enter__(self):
