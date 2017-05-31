@@ -127,41 +127,46 @@ def unpack_archive(file, extract_dir, format_, msg):
 
 
 class ConfigFile:
-    str_config = """
-    [DANE LOGOWANIA]
-    username =
-    password =
-
-    [WykopApi]
-    appkey =
-    secretkey =
-    accountkey =
-    # opcjonalnie:
-    userkey =
-
-    [ARGUMENTY]
-    # przykład: static_args = -s chrome --skip -n
-    static_args =
-
-    [POBIERANE ROZSZERZENIA]
-    exts = .gif .jpg .jpeg .png .webm
-    """
+    template = [
+        ['DANE LOGOWANIA', [
+            ['username', ''],
+            ['password', '']
+        ]],
+        ['WykopAPI', [
+            ['appkey', ''],
+            ['secretkey', ''],
+            ['accountkey', ''],
+            ['# opcjonalnie:'],
+            ['userkey', '']
+        ]],
+        ['ARGUMENTY', [
+            ['# przykład: static_args = -s chrome --skip -n'],
+            ['static_args', '']
+        ]],
+        ['POBIERANE ROZSZERZENIA', [
+            ['exts', '.gif .jpg .jpeg .png .webm']
+        ]]
+    ]
 
     def __init__(self):
         self.file_path = os.path.join(settings.BASE_DIR, settings.CONFIG_FILE)
+        self.config = configparser.ConfigParser(allow_no_value=True)
+
+    def prepare(self):
+        for section, options_and_values in self.template:
+            self.config.add_section(section)
+            for opt_val in options_and_values:
+                self.config.set(section, *opt_val)
 
     def create_configfile(self):
-        config = configparser.ConfigParser()
-        config.read_string(self.str_config)
         with open(self.file_path, 'w') as configfile:
-            config.write(configfile)
+            self.config.write(configfile)
 
     def read_and_apply_config(self):
-        config = configparser.ConfigParser()
-        config.read(self.file_path)
-        for section in config.sections():
-            for option in config[section]:
-                value = config.get(section, option)
+        self.config.read(self.file_path)
+        for section in self.config.sections():
+            for option in self.config[section]:
+                value = self.config.get(section, option)
                 if value:
                     if option in ('static_args', 'exts'):
                         value = value.split(' ')
@@ -171,4 +176,5 @@ class ConfigFile:
         if os.path.isfile(self.file_path):
             self.read_and_apply_config()
         else:
+            self.prepare()
             self.create_configfile()
