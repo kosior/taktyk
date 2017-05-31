@@ -41,5 +41,4 @@ def ids_validator(ids):
     f_ids = {id_ for id_ in ids if id_.isdigit()}
     if not f_ids:
         raise ValueError('Brak odpowiednich id wpisów.')
-    logging.info('...ilość podanych numerów id: %s', len(f_ids))
     return f_ids

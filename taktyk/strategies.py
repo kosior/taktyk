@@ -48,7 +48,7 @@ class SourceStrategy(Strategy):
             if not ids:
                 logging.error('Nie znaleziono numerów id.')
                 raise SystemExit
-            logging.info('...ilość znalezionych numerów id: %s', len(ids))
+            logging.info('...ilość podanych numerów id: %s', len(ids))
             logging.info('...generowanie wpisów')
             return self.get_content_by_ids(ids)
 

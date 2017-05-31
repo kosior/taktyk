@@ -28,7 +28,6 @@ def log_in_for_userkey():
     url = settings.API_LOGIN_URL + settings.APPKEY
 
     while True:
-        print('--- Ctrl+C aby wyjść ---')
         username = get_username()
 
         if settings.SECRETKEY and settings.ACCOUNTKEY:
@@ -36,6 +35,7 @@ def log_in_for_userkey():
             headers = apisign(url, settings.SECRETKEY, **data)
             msg = 'Nieprawidłowy login, accountkey, lub secretkey.'
         else:
+            print('--- Ctrl+C aby wyjść ---')
             password = getpass.getpass(prompt='Podaj hasło: ', stream=None)
             data = {'login': username, 'password': password}
             msg = 'Nieprawidłowy login lub hasło.'
