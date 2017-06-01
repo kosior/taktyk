@@ -66,15 +66,19 @@ def get_commands():
     return commands
 
 
-def process_args(static_args=None):
+def prepare_static_args(static_args=None):
     args = sys.argv[1:]
     if static_args:
+        static_args = list(filter(None, static_args))
         logging.info('...podane argumenty: %s', static_args)
         args.extend(static_args)
-        args = list(set(args))
+        args = list(OrderedDict.fromkeys(args))
+    return args
 
+
+def process_args(static_args=None):
+    args = prepare_static_args(static_args)
     logging.info('...konfiguracja i przetwarzanie argumentów')
-
     parsed_args = _parse(args)
     commands = get_commands()
 
