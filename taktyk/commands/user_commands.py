@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+import sys
 import tempfile
 from distutils.dir_util import copy_tree
 
@@ -28,7 +29,7 @@ class PdkCommand(AbsCommand):
 
     def execute(self, *args):
         msg = 'Podaj klucz użytkownika (0 - aby wyjść): '
-        decision = Decision(msg, {'0': exit}, validator=userkey_validator)
+        decision = Decision(msg, {'0': sys.exit}, validator=userkey_validator)
         settings.USERKEY = decision.run()
 
 
@@ -37,7 +38,7 @@ class FileSourceCommand(AbsCommand):
 
     def execute(self, *args):
         msg = 'Podaj scieżkę do pliku lub folderu (0 - aby wyjść): '
-        decision = Decision(msg, {'0': exit}, validator=source_validator)
+        decision = Decision(msg, {'0': sys.exit}, validator=source_validator)
         settings.SOURCE = decision.run()
         settings.STRATEGY = SourceStrategy
 
@@ -62,7 +63,7 @@ class DeleteCommand(AbsCommand):
 
     def execute(self, arg, *args):
         msg = 'Wprowadz numery id wpisów do usunięcia: (0 - aby wyjść): '
-        ids_del = Decision(msg, {'0': exit}, validator=ids_validator).run()
+        ids_del = Decision(msg, {'0': sys.exit}, validator=ids_validator).run()
 
         db_choice = 'z bazy danych'
         wykop_choice = 'z ulubionych na stronie www.wykop.pl'
@@ -72,7 +73,7 @@ class DeleteCommand(AbsCommand):
 
         msg = 'Czy na pewno chcesz usunąć wprowadzone wpisy {} (T/n): '.format(choice.get(arg))
 
-        Decision(msg, {'T': None, 'n': exit}).run()
+        Decision(msg, {'T': None, 'n': sys.exit}).run()
 
         if arg in ['db', 'all']:
             logging.info('...kasowanie wpisów z bazy danych')
@@ -80,7 +81,7 @@ class DeleteCommand(AbsCommand):
         if arg in ['wykop', 'all']:
             logging.info('...usuwanie wpisów z ulubionych na www.wykop.pl')
             self.delete_from_wykop(ids_del)
-        exit()
+        sys.exit()
 
     @staticmethod
     def delete_from_db(ids):
@@ -106,7 +107,7 @@ class HtmlCommand(AbsCommand):
     def execute(self, arg, *args):
         arg = arg if arg is not True else None
         HtmlFile(tag=arg).create()
-        exit()
+        sys.exit()
 
 
 class SaveCommand(AbsCommand):
@@ -123,7 +124,7 @@ class SaveCommand(AbsCommand):
                 for comment in entry.comments:
                     if comment.media_url:
                         mlt.put(comment.download_info())
-        exit()
+        sys.exit()
 
 
 class CommentsCommand(AbsCommand):
@@ -166,7 +167,7 @@ class IdsCommand(AbsCommand):
 
     def execute(self, *args):
         msg = 'Wprowadz numery id: (0 - aby wyjść): '
-        ids = Decision(msg, {'0': exit}, validator=ids_validator).run()
+        ids = Decision(msg, {'0': sys.exit}, validator=ids_validator).run()
         settings.SOURCE = {'ids': ids}
         settings.STRATEGY = SourceStrategy
 
@@ -190,12 +191,12 @@ class UpdateCommand(AbsCommand):
             self.save_and_unpack()
             self.delete_selenium_driver_files()
             logging.info('...aktualizacja przebiegła pomyślnie')
-        exit()
+        sys.exit()
 
     def choose(self):
         msg = '{}\nChcesz pobrać powyższy plik i kontunuować aktualizację? ' \
               '(T/n): '.format(self.master_zip_url)
-        dec = Decision(msg, {'T': True, 'n': exit})
+        dec = Decision(msg, {'T': True, 'n': sys.exit})
         return dec.run()
 
     def save_and_unpack(self):

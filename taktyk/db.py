@@ -1,6 +1,7 @@
 import logging
 import os
 import sqlite3
+import sys
 import time
 import traceback
 from contextlib import ContextDecorator
@@ -25,7 +26,7 @@ class DB:
     @classmethod
     def ask_and_create(cls):
         msg = 'Podaj nazwę dla bazy danych (0 - aby wyjść): '
-        name = Decision(msg, {'0': exit}, validator=lambda x: x).run()
+        name = Decision(msg, {'0': sys.exit}, validator=lambda x: x).run()
         cls.create_new(name.strip())
         logging.info('...utworzono nową bazę danych: ' + settings.DB_NAME)
 

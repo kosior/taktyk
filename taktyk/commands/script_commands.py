@@ -80,7 +80,7 @@ class ModulesHandler(AbsCommand):
         if self.try_import('pip', add=False):
             msg_dec = msg_dec.format(modules_text)
             decision = Decision(msg_dec, {'T': {self.install_unimported: (self.unimported,)},
-                                          'n': exit})
+                                          'n': sys.exit})
             decision.run()
             if all(self.import_all(reload=True)):
                 logging.info('...ponowne uruchamianie')
@@ -154,7 +154,7 @@ class DBHandler(AbsCommand):
         settings.DB_NAME = db_name
 
     def choose(self):
-        options = {'0': exit, 'n': DB.ask_and_create()}
+        options = {'0': sys.exit, 'n': DB.ask_and_create()}
         msg = '\n Wybierz bazę danych i naciśnij ENTER\n\n'
         for num, db_name in enumerate(self.db_list):
             options[str(num + 1)] = {self.set_db_name: (db_name,)}

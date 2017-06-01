@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 import stat
+import sys
 import tempfile
 import traceback
 
@@ -74,7 +75,7 @@ class SeleniumDriver:
 
     def choose(self):
         msg = '{}\nChcesz pobrać powyższy plik? (T/n): '.format(self.download_url)
-        dec = Decision(msg, options={'T': True, 'n': exit})
+        dec = Decision(msg, options={'T': True, 'n': sys.exit})
         return dec.run()
 
     def get_driver(self):
