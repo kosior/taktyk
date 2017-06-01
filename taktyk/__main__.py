@@ -3,11 +3,10 @@ import os
 import sys
 
 if sys.version_info <= (3, 5, 2):
-    sys.stdout.write('Program wymaga conamniej Pythona w wersji 3.5.2\n')
+    sys.stdout.write('Program wymaga co najmniej Pythona w wersji 3.5.2\n')
     sys.exit(1)
 
-path = os.path.realpath(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(path)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(os.path.abspath(__file__)))))
 
 from taktyk import main
 

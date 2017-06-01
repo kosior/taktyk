@@ -26,11 +26,12 @@ def get_username():
 def log_in_for_userkey():
     headers = {}
     url = settings.API_LOGIN_URL + settings.APPKEY
+    provided_api_app = settings.SECRETKEY and settings.ACCOUNTKEY
 
     while True:
         username = get_username()
 
-        if settings.SECRETKEY and settings.ACCOUNTKEY:
+        if provided_api_app:
             data = {'login': username, 'accountkey': settings.ACCOUNTKEY}
             headers = apisign(url, settings.SECRETKEY, **data)
             msg = 'Nieprawidłowy login, accountkey, lub secretkey.'
@@ -49,7 +50,9 @@ def log_in_for_userkey():
             userkey = response.json()['userkey']
         except (json.decoder.JSONDecodeError, KeyError):
             logging.error(msg)
-            logging.info(traceback.format_exc())
+            logging.debug(traceback.format_exc())
+            if provided_api_app:
+                break
             continue
         else:
             settings.USERKEY = userkey
