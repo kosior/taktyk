@@ -29,7 +29,8 @@ API_CHECK_URL = 'https://a.wykop.pl/appkey/'
 # ---
 
 FAVORITES_URL_F = 'https://www.wykop.pl/i/ludzie/ulubione/{username}/entries/strona/'
-ENTRY_URL = 'https://www.wykop.pl/i/wpis/'
+ENTRY_URL = 'https://www.wykop.pl/wpis/'
+ENTRY_URL_SCRAPE = 'https://www.wykop.pl/i/wpis/'
 
 API_FAVORITES_URL_F = 'https://a.wykop.pl/favorites/entries/userkey/{userkey}/appkey/{appkey}/page/'
 API_ENTRY_URL_F = 'https://a.wykop.pl/entries/index/{{index}}/appkey/{appkey}'

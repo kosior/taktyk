@@ -66,7 +66,7 @@ class ApiContent:
 
 class HtmlContent:
     def __init__(self):
-        self.entry_url = settings.ENTRY_URL
+        self.entry_url = settings.ENTRY_URL_SCRAPE
 
     def get_entry(self, id_):
         entry_url = self.entry_url + id_

@@ -499,8 +499,8 @@
         <div class="full-entry {{ entry.tags }}" id="e{{ entry.id_ }}">
             <div class="entry">
                 <div class="entry-header">
-                    <a href="http://www.wykop.pl/ludzie/{{ entry.author }}">{{ entry.author }}</a>
-                    <a href="http://www.wykop.pl/wpis/{{ entry.id_ }}">{{ entry.date }}</a>
+                    <a href="https://www.wykop.pl/ludzie/{{ entry.author }}">{{ entry.author }}</a>
+                    <a href="{{ entry.url }}">{{ entry.date }}</a>
                     <span class="plus">+{{ entry.plus }}</span>
 
                     {% if entry.media_url %}
@@ -562,8 +562,8 @@
                 {% for comment in entry.comments %}
                 <div class="comment">
                     <div class="entry-header">
-                        <a href="http://www.wykop.pl/ludzie/{{ entry.author }}">{{ comment.author }}</a>
-                        <a href="http://www.wykop.pl/wpis/{{ entry.id_ }}/#comment-{{ comment.id_ }}">{{ comment.date}}</a>
+                        <a href="https://www.wykop.pl/ludzie/{{ entry.author }}">{{ comment.author }}</a>
+                        <a href="{{ comment.url }}">{{ comment.date}}</a>
                         <span class="plus">+{{ comment.plus }}</span>
 
                         {% if comment.media_url %}
