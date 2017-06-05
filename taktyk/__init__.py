@@ -21,7 +21,8 @@ from .utils import configure_logging, ex_hook, ConfigFile
 
 def pipeline(strategy, method):
     progress_info = '\rIlość wpisów: {}      Ilość komentarzy: {}'
-    if settings.SKIP_FILES:
+    skip_files = settings.SKIP_FILES
+    if skip_files:
         proc_count = 0
     else:
         proc_count = 5
@@ -32,7 +33,9 @@ def pipeline(strategy, method):
             for entry in method().generate(raw_entry):
                 DB.insert_one(cursor, entry)
                 print(progress_info.format(settings.ENTRIES_ADDED, settings.COMMENTS_ADDED), end='')
-                if entry.media_url and not settings.SKIP_FILES:
+                if entry.media_url and not skip_files:
+                    if skip_files == 'com' and entry.entry_id:
+                        continue
                     mlt.put(entry.download_info())
 
     if settings.ENTRIES_ADDED or settings.COMMENTS_ADDED:

@@ -122,7 +122,7 @@ class SaveCommand(AbsCommand):
                 if entry.media_url:
                     mlt.put(entry.download_info())
                 for comment in entry.comments:
-                    if comment.media_url:
+                    if comment.media_url and not settings.SKIP_FILES == 'com':
                         mlt.put(comment.download_info())
         sys.exit()
 
@@ -148,8 +148,8 @@ class NsfwCommand(AbsCommand):
 class SkipCommand(AbsCommand):
     name = 'skip'
 
-    def execute(self, *args):
-        settings.SKIP_FILES = True
+    def execute(self, arg, *args):
+        settings.SKIP_FILES = arg
 
 
 class ScrapeCommand(AbsCommand):

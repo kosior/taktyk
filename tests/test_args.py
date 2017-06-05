@@ -128,6 +128,8 @@ class ParseTest(unittest.TestCase):
     def test_skip_arg(self):
         parsed = _parse(static_args=['--skip'])
         self.assertEqual(parsed['skip'], True)
+        parsed = _parse(static_args=['--skip', 'com'])
+        self.assertEqual(parsed['skip'], 'com')
 
     def test_scrape_arg(self):
         parsed = _parse(static_args=['--scrape'])

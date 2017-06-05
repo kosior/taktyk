@@ -119,9 +119,13 @@ class SkipCommandTest(unittest.TestCase):
     def test_name(self):
         self.assertEqual('skip', SkipCommand.name)
 
-    def test_execute(self):
-        SkipCommand().execute()
-        self.assertTrue(settings.SKIP_FILES)
+    def test_execute_when_arg_is_true(self):
+        SkipCommand().execute(arg=True)
+        self.assertTrue(settings.SKIP_FILES is True)
+
+    def test_execute_when_arg_is_com(self):
+        SkipCommand().execute(arg='com')
+        self.assertTrue(settings.SKIP_FILES == 'com')
 
 
 class ScrapeCommandTest(unittest.TestCase):
