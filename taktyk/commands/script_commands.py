@@ -154,7 +154,7 @@ class DBHandler(AbsCommand):
         settings.DB_NAME = db_name
 
     def choose(self):
-        options = {'0': sys.exit, 'n': DB.ask_and_create()}
+        options = {'0': sys.exit, 'n': DB.ask_and_create}
         msg = '\n Wybierz bazę danych i naciśnij ENTER\n\n'
         for num, db_name in enumerate(self.db_list):
             options[str(num + 1)] = {self.set_db_name: (db_name,)}

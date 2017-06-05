@@ -122,7 +122,8 @@ class DB:
         try:
             cursor.execute(statement, params)
         except sqlite3.IntegrityError:
-            logging.info(traceback.format_exc())
+            logging.debug(traceback.format_exc())
+            return False
         else:
             set_added_info(obj.type_)
             return True
@@ -191,7 +192,7 @@ class DB:
             return
 
         for tags_row in tags:
-            tags = set(tags_row[0].split(' '))
+            tags = set(tags_row[0].strip().split(' '))
             for tag in tags:
                 if tag in tags_dict.keys():
                     tags_dict[tag] += 1
