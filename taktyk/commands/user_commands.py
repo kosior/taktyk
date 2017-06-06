@@ -62,18 +62,8 @@ class DeleteCommand(AbsCommand):
     name = 'delete'
 
     def execute(self, arg, *args):
-        msg = 'Wprowadz numery id wpisów do usunięcia: (0 - aby wyjść): '
-        ids_del = Decision(msg, {'0': sys.exit}, validator=ids_validator).run()
-
-        db_choice = 'z bazy danych'
-        wykop_choice = 'z ulubionych na stronie www.wykop.pl'
-        all_choice = '{} oraz {}'.format(db_choice, wykop_choice)
-
-        choice = {'db': db_choice, 'wykop': wykop_choice, 'all': all_choice}
-
-        msg = 'Czy na pewno chcesz usunąć wprowadzone wpisy {} (T/n): '.format(choice.get(arg))
-
-        Decision(msg, {'T': None, 'n': sys.exit}).run()
+        ids_del = self.get_ids()
+        Decision(self.create_msg(arg), {'T': None, 'n': sys.exit}).run()
 
         if arg in ['db', 'all']:
             logging.info('...kasowanie wpisów z bazy danych')
@@ -82,6 +72,21 @@ class DeleteCommand(AbsCommand):
             logging.info('...usuwanie wpisów z ulubionych na www.wykop.pl')
             self.delete_from_wykop(ids_del)
         sys.exit()
+
+    @staticmethod
+    def get_ids():
+        msg = 'Wprowadz numery id wpisów do usunięcia: (0 - aby wyjść): '
+        ids_del = Decision(msg, {'0': sys.exit}, validator=ids_validator).run()
+        return ids_del
+
+    @staticmethod
+    def create_msg(arg):
+        db_choice = 'z bazy danych'
+        wykop_choice = 'z ulubionych na stronie www.wykop.pl'
+        all_choice = '{} oraz {}'.format(db_choice, wykop_choice)
+        choice = {'db': db_choice, 'wykop': wykop_choice, 'all': all_choice}
+        msg = 'Czy na pewno chcesz usunąć wprowadzone wpisy {} (T/n): '.format(choice.get(arg))
+        return msg
 
     @staticmethod
     def delete_from_db(ids):

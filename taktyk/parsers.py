@@ -18,24 +18,24 @@ class JsonParser:
         self.entry.id_ = json_.get('id')
         self.entry.type_ = json_.get('type')
 
-    def _parse_static(self, json_):
-        self.entry.author = json_.get('author')
-        self.entry.date = json_.get('date')
-        self.entry.plus = str(json_.get('vote_count'))
+    def _parse_static(self):
+        self.entry.author = self.json_.get('author')
+        self.entry.date = self.json_.get('date')
+        self.entry.plus = str(self.json_.get('vote_count'))
 
         if self.entry.type_ == 'entry_comment':
-            self.entry.entry_id = json_.get('entry_id')
+            self.entry.entry_id = self.json_.get('entry_id')
             self.entry.url = '{}{}/#comment-{}'.format(self.entry_url, self.entry.entry_id,
                                                        self.entry.id_)
         else:
             self.entry.url = self.entry_url + str(self.entry.id_)
 
-        if json_.get('embed'):
-            self.entry.media_url = json_.get('embed', {}).get('url')
+        if self.json_.get('embed'):
+            self.entry.media_url = self.json_.get('embed', {}).get('url')
 
-    def _parse_body_and_tags(self, json_):
+    def _parse_body_and_tags(self):
         tags = []
-        body_html = json_.get('body')
+        body_html = self.json_.get('body')
         body = bs4.BeautifulSoup('<html>{}</html>'.format(body_html), 'html.parser')
         hrefs = [a.get('href') for a in body.find_all('a')]
 
@@ -53,18 +53,18 @@ class JsonParser:
         else:
             self.entry.tags = ' # '
 
-    def _parse_nsfw(self, json_, tags):
+    def _parse_nsfw(self):
         self.entry.is_nsfw = False
-        if json_.get('embed'):
-            self.entry.is_nsfw = json_.get('embed', {}).get('plus18')
+        if self.json_.get('embed'):
+            self.entry.is_nsfw = self.json_.get('embed', {}).get('plus18')
         if not self.entry.is_nsfw:
-            if 'nsfw' in tags:
+            if 'nsfw' in self.entry.tags:
                 self.entry.is_nsfw = True
 
     def parse(self):
-        self._parse_static(self.json_)
-        self._parse_body_and_tags(self.json_)
-        self._parse_nsfw(self.json_, self.entry.tags)
+        self._parse_static()
+        self._parse_body_and_tags()
+        self._parse_nsfw()
         return self.entry
 
 
