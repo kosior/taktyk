@@ -35,28 +35,28 @@ class Save:
             return ext
         return None
 
-    def get_gfycat_url(self, url):
-        name = url.split(self.gfycat)[-1]
+    def get_gfycat_url(self):
+        name = self.media_url.split(self.gfycat)[-1]
         try:
             json_ = Request.get_json(self.gfycat_api+name)
         except ValueError:
-            self.save_to_text_file(url)
+            self.save_to_text_file()
             return None
         else:
             return json_.get('gfyItem', {}).get('webmUrl')
 
     def get_file_url(self):
         if not self._ext:
-            self.save_to_text_file(self.media_url)
+            self.save_to_text_file()
             return None
         if self._ext == '.webm' and 'gfycat.com' in self.media_url:
-            return self.get_gfycat_url(self.media_url)
+            return self.get_gfycat_url()
         return self.media_url
 
-    def save_to_text_file(self, url):
+    def save_to_text_file(self):
         full_path = os.path.join(self.cwd, self.unsaved_file)
         with open(full_path, 'a+') as file:
-            file.write('{},{},{}\n'.format(self.id_, self.is_nsfw, url))
+            file.write('{},{},{}\n'.format(self.id_, self.is_nsfw, self.media_url))
 
     def save(self):
         if self.url and self.nsfw_consistent:
