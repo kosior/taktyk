@@ -58,9 +58,11 @@ class SourceStrategy(Strategy):
         try:
             with open(path, 'rt') as file:
                 ids_lst = entry_id_regex.findall(file.read())
-            return [id_ for id_tuple in ids_lst for id_ in id_tuple if id_]
         except (OSError, ValueError):
             return []
+        else:
+            ids = [id_ for id_tuple in ids_lst for id_ in id_tuple if id_]
+            return list(set(ids))
 
     @classmethod
     def get_ids_from_dir(cls, path):
@@ -73,7 +75,7 @@ class SourceStrategy(Strategy):
                     ids.extend(HtmlParser.find_ids_in_html(page))
             else:
                 ids.extend(cls.get_ids_from_file(file))
-        return ids
+        return list(set(ids))
 
 
 class SeleniumStrategy(Strategy):
