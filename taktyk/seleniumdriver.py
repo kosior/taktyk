@@ -44,9 +44,9 @@ class SeleniumDriver:
         return False
 
     def get_suffix(self):
-        sys = platform.system()
+        system = platform.system()
         arch = platform.architecture()[0].replace('bit', '')
-        return self.sfx.get(sys).format(arch)
+        return self.sfx.get(system).format(arch)
 
     @staticmethod
     def get_format(url):
