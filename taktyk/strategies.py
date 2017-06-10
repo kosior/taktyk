@@ -27,6 +27,23 @@ class Strategy(metaclass=abc.ABCMeta):
             return HtmlContent().gen_html_entries_by_ids(ids)
         return ApiContent().gen_entries_by_ids(ids)
 
+    @staticmethod
+    def scrape_pages_for_ids(username, get_page_func):
+        ids = []
+        page_num = 1
+        url = settings.FAVORITES_URL_F.format(username=username)
+
+        while True:
+            full_url = url + str(page_num)
+            page = get_page_func(full_url)
+            new_ids = HtmlParser.find_ids_in_html(page)
+            if new_ids:
+                ids.extend(new_ids)
+                page_num += 1
+            else:
+                break
+        return ids
+
 
 class APIStrategy(Strategy):
     def execute(self):
@@ -127,52 +144,32 @@ class SeleniumStrategy(Strategy):
             logging.debug(err)
             raise SystemExit
 
+    def get_page(self, url):
+        self.driver.get(url)
+        return self.driver.page_source
+
     def get_ids(self):
-        ids = []
-        page_num = 1
-
-        url = settings.FAVORITES_URL_F.format(username=self.get_login())
-
-        while True:
-            full_url = url + str(page_num)
-            self.driver.get(full_url)
-            page = self.driver.page_source
-
-            new_ids = HtmlParser.find_ids_in_html(page)
-
-            if new_ids:
-                ids.extend(new_ids)
-                page_num += 1
-            else:
-                break
+        ids = self.scrape_pages_for_ids(self.get_login(), self.get_page)
         return ids
 
 
 class SessionStrategy(Strategy):
+    def __init__(self):
+        self.session = None
+
     def execute(self):
         logging.info('...uruchamianie SessionStrategy')
         logging.info('...rozpoczęcie logowania')
-        session = log_in_for_session()
+        self.session = log_in_for_session()
         logging.info('...pobieranie numerów id')
-        ids = self.process_session(session)
+        ids = self.process_session()
         logging.info('...generowanie wpisów')
         return self.get_content_by_ids(ids)
 
-    @staticmethod
-    def process_session(session):
-        ids = []
-        page_num = 1
-        url = settings.FAVORITES_URL_F.format(username=settings.USERNAME)
+    def get_page(self, url):
+        page = self.session.get(url, headers=dict(referer=url))
+        return page.text
 
-        while True:
-            full_url = url + str(page_num)
-            page = session.get(full_url, headers=dict(referer=full_url))
-
-            new_ids = HtmlParser.find_ids_in_html(page.text)
-
-            if new_ids:
-                ids.extend(new_ids)
-                page_num += 1
-            else:
-                break
+    def process_session(self):
+        ids = self.scrape_pages_for_ids(settings.USERNAME, self.get_page)
         return ids
