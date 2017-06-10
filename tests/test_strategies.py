@@ -1,7 +1,7 @@
 import os
 import sys
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, Mock, call
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(os.path.abspath(__file__)))))
 
@@ -23,6 +23,26 @@ class GetContentByIdsTest(unittest.TestCase):
         ids = [1, 2, 3]
         Strategy.get_content_by_ids(ids)
         mock_gen_entries_by_ids.assert_called_with(ids)
+
+
+class ScrapePagesForIdsTest(unittest.TestCase):
+    def setUp(self):
+        settings.FAVORITES_URL_F = '{username}/page/'
+        patcher = patch('taktyk.strategies.HtmlParser.find_ids_in_html')
+        self.mock_find_ids_in_html = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_if_get_page_func_called(self):
+        get_page_func = Mock()
+        self.mock_find_ids_in_html.side_effect = [[1], [2], [3], None]
+        Strategy.scrape_pages_for_ids('test_user', get_page_func)
+        calls = [call('test_user/page/{}'.format(i)) for i in range(1, 5)]
+        get_page_func.assert_has_calls(calls)
+
+    def test_return_value(self):
+        self.mock_find_ids_in_html.side_effect = [[1, 2], [3, 4], [5], None]
+        ids = Strategy.scrape_pages_for_ids('test_user', Mock())
+        self.assertEqual(ids, [1, 2, 3, 4, 5])
 
 
 class ApiStrategyTest(unittest.TestCase):

@@ -4,7 +4,7 @@ import unittest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(os.path.abspath(__file__)))))
 
-from taktyk.parsers import JsonParser
+from taktyk.parsers import JsonParser, HtmlParser
 
 
 class JsonParserInitTest(unittest.TestCase):
@@ -141,3 +141,65 @@ class JsonParserParseTest(unittest.TestCase):
         self.assertEqual(True, entry.is_nsfw)
         self.assertTrue('taktyk' in entry.tags)
         self.assertTrue('python' in entry.tags)
+
+
+class HtmlParserTest(unittest.TestCase):
+    entries = '''<html><body>
+        <li class="entry iC "> <div class="wblock lcontrast dC  " data-id="1" data-type="entry"></div></li>
+        <li class="entry iC "> <div class="wblock lcontrast dC  " data-id="2" data-type="entry"></div></li>
+        <li class="entry iC "> <div class="wblock lcontrast dC  " data-id="3" data-type="entry"></div></li>
+        </body></html>'''
+    entry = '''<html><body>
+        <li class="entry iC ">
+         <div class="wblock lcontrast dC  " data-id="1" data-type="entry">
+         <a class="color-1 showProfileSummary" href="https://www.wykop.pl/ludzie/test_user/" title=""><b>test_user</b></a>
+         <time title="2018-05-05 21:36:47" pubdate=""></time><p class="vC" data-vc="1000" data-vcp="0" data-vcm="0">
+         </p><div class="text"><p>Test text<a class="showSpoiler">pokaż spoiler</a>
+        #<a class="showTagSummary" href="https://www.wykop.pl/tag/programowanie">programowanie</a>
+        #<a class="showTagSummary" href="https://www.wykop.pl/tag/python">python</a></p>
+         <div class="media-content" data-type="entry" data-id="1"><a href="https://www.test-url.pl/file.jpg"> </a>
+        <span class="plus18item">18+</span></div></div></div>
+         <ul>
+         <li><div class="wblock lcontrast dC  " data-id="111" data-type="entrycomment">
+         <a class="color-1 showProfileSummary" href="https://www.wykop.pl/ludzie/test_user_com1/" title=""><b>test_user_com1</b></a>
+         <time title="2018-05-06 12:36:47" pubdate=""></time><p class="vC" data-vc="15" data-vcp="0" data-vcm="0">
+         </p><div class="text"><p>Test text comment 1<a class="showSpoiler">pokaż spoiler</a></p>
+         <div class="media-content" data-type="entry" data-id="1"><a href="https://www.test-url.pl/file2.jpg"> </a></div></div>
+         </li>
+         <li><div class="wblock lcontrast dC  " data-id="222" data-type="entrycomment">
+         <a class="color-1 showProfileSummary" href="https://www.wykop.pl/ludzie/test_user_com2/" title=""><b>test_user_com2</b></a>
+         <time title="2018-05-07 05:36:47" pubdate=""></time><p class="vC" data-vc="2" data-vcp="0" data-vcm="0">
+         </p><div class="text"><p>Test text<a class="showSpoiler">pokaż spoiler</a>
+        #<a class="showTagSummary" href="https://www.wykop.pl/tag/taktyk">taktyk</a></p>
+         </div></ul></li></body></html>'''
+
+    def test_find_ids_in_html(self):
+        ids = HtmlParser.find_ids_in_html(self.entries)
+        self.assertEqual(['1', '2', '3'], ids)
+
+    def test_get_entries_soup_list(self):
+        parser = HtmlParser('1', self.entry)
+        self.assertEqual(3, len(parser.soup_list))
+
+    def test_get_main_entry(self):
+        entry = HtmlParser('1', self.entry).get_main_entry()
+        self.assertEqual(1, entry.id_)
+        self.assertEqual('test_user', entry.author)
+        self.assertEqual('2018-05-05 21:36:47', entry.date)
+        self.assertTrue('Test text' in entry.body)
+        self.assertTrue('https://www.wykop.pl/tag/programowanie' in entry.body_html)
+        self.assertEqual('1000', entry.plus)
+        self.assertEqual('https://www.test-url.pl/file.jpg', entry.media_url)
+        self.assertEqual(' programowanie python ', entry.tags)
+        self.assertTrue(entry.is_nsfw)
+        self.assertEqual('entry', entry.type_)
+        self.assertIsNone(entry.entry_id)
+
+    def test_get_comments_generator(self):
+        comments = list(HtmlParser('1', self.entry).get_comments_generator(start_index=1))
+        authors = ['test_user_com1', 'test_user_com2']
+        self.assertEqual(2, len(comments))
+        for i, com in enumerate(comments):
+            self.assertEqual(authors[i], com.author)
+            self.assertEqual('1', com.entry_id)
+            self.assertEqual('entry_comment', com.type_)
