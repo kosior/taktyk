@@ -208,7 +208,7 @@ class UpdateCommand(AbsCommand):
         with tempfile.TemporaryDirectory() as tempdir:
             full_path = os.path.join(tempdir, self.file_name)
             if not self.save_file(self.master_zip_url, full_path):
-                logging.CRITICAL(self.msg_err)
+                logging.critical(self.msg_err)
                 raise SystemExit
             unpack_archive(full_path, tempdir, 'zip', self.msg_err)
             taktyk_path = os.path.join(tempdir, 'taktyk-master', 'taktyk')

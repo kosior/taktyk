@@ -68,7 +68,7 @@ class SeleniumDriver:
             full_path = os.path.join(tempdir, file_name)
             logging.info('...pobieranie sterownika')
             if not self.save_file_func(self.download_url, full_path):
-                logging.CRITICAL(self.msg)
+                logging.critical(self.msg)
                 raise SystemExit
             logging.info('...rozpakowywanie archiwum')
             unpack_archive(full_path, self.folder_path, fmt, self.msg)
