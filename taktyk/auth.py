@@ -23,6 +23,17 @@ def get_username():
     return settings.USERNAME
 
 
+def get_password():
+    if not settings.PASSWORD:
+        return getpass.getpass(prompt='Podaj hasło: ', stream=None)
+    return settings.PASSWORD
+
+
+def reset_credentials():
+    settings.USERNAME = None
+    settings.PASSWORD = None
+
+
 def log_in_for_userkey():
     headers = {}
     url = settings.API_LOGIN_URL + settings.APPKEY
@@ -36,8 +47,7 @@ def log_in_for_userkey():
             headers = apisign(url, settings.SECRETKEY, **data)
             msg = 'Nieprawidłowy login, accountkey, lub secretkey.'
         else:
-            print('--- Ctrl+C aby wyjść ---')
-            password = getpass.getpass(prompt='Podaj hasło: ', stream=None)
+            password = get_password()
             data = {'login': username, 'password': password}
             msg = 'Nieprawidłowy login lub hasło.'
 
@@ -52,7 +62,8 @@ def log_in_for_userkey():
             logging.error(msg)
             logging.debug(traceback.format_exc())
             if provided_api_app:
-                break
+                raise SystemExit
+            reset_credentials()
             continue
         else:
             settings.USERKEY = userkey
@@ -79,9 +90,8 @@ def log_in_for_session():
     wykop_url = settings.WYKOP_URL
 
     while True:
-        print('--- Ctrl+C aby wyjść ---')
         username = get_username()
-        password = getpass.getpass(prompt='Podaj hasło: ', stream=None)
+        password = get_password()
 
         session = requests.session()
         session.post(login_url, data={'user[username]': username,
@@ -97,12 +107,14 @@ def log_in_for_session():
             username_logged = soup.find(class_='avatar').get('alt')
         except AttributeError:
             logging.error('Błąd przy logowaniu.')
+            reset_credentials()
             continue
         else:
             if username_logged.lower() == username.lower():
                 return session
             else:
                 logging.error('Nieprawidłowy login lub hasło.')
+                reset_credentials()
                 continue
 
 
