@@ -45,6 +45,7 @@ def pipeline(strategy, method):
 
 
 def main():
+    print('--- Aby zakończyć wciśnij Ctrl+C ---')
     signal.signal(signal.SIGINT, lambda s, f: sys.exit(''))  # handling KeyboardInterrupt
     sys.excepthook = ex_hook  # creating hook for uncaught exceptions
     configure_logging()
