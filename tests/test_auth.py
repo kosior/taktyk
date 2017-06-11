@@ -24,6 +24,27 @@ class GetUsernameTest(unittest.TestCase):
         self.assertEqual(auth.get_username(), 'InputName')
 
 
+class GetPasswordTest(unittest.TestCase):
+    def test_password_exist(self):
+        settings.PASSWORD = 'UserPass'
+        self.assertEqual(auth.get_password(), 'UserPass')
+
+    @patch('getpass.getpass')
+    def test_password_not_exist(self, test_getpass):
+        settings.PASSWORD = ''
+        test_getpass.return_value = 'InputPass'
+        self.assertEqual(auth.get_password(), 'InputPass')
+
+
+class RestetCredentialsTest(unittest.TestCase):
+    def test_if_reset_applied(self):
+        settings.USERNAME = 'name'
+        settings.PASSWORD = 'pass'
+        auth.reset_credentials()
+        self.assertIsNone(settings.USERNAME)
+        self.assertIsNone(settings.PASSWORD)
+
+
 class LogInForUserkeyTest(unittest.TestCase):
     def setUp(self):
         settings.USERNAME = 'login123'
@@ -37,7 +58,7 @@ class LogInForUserkeyTest(unittest.TestCase):
         data = {'login': 'login123', 'accountkey': 'acckey123'}
         headers = auth.apisign(self.url, 'secret321', **data)
         mock_resp = Mock()
-        mock_resp.json.return_value = {}
+        mock_resp.json.return_value = {'userkey': '123'}
         test_post.return_value = mock_resp
         auth.log_in_for_userkey()
         test_post.assert_called_with(self.url, data=data, headers=headers)
@@ -49,7 +70,8 @@ class LogInForUserkeyTest(unittest.TestCase):
         mock_resp = Mock()
         mock_resp.json.return_value = {}  # this will raise KeyError
         test_post.return_value = mock_resp
-        self.assertIsNone(auth.log_in_for_userkey())
+        with self.assertRaises(SystemExit):
+            auth.log_in_for_userkey()
 
     @patch('taktyk.auth.save_userkey')
     @patch('requests.post')
@@ -77,9 +99,11 @@ class LogInForUserkeyTest(unittest.TestCase):
         auth.log_in_for_userkey()
         test_post.assert_called_with(self.url, data=data, headers=headers)
 
+    @patch('taktyk.auth.get_username')
     @patch('requests.post')
     @patch('getpass.getpass')
-    def test_when_ask_for_password_check_if_continues_on_error(self, test_getpass, test_post):
+    def test_when_ask_for_password_check_if_continues_on_error(self, test_getpass, test_post, test_username):
+        test_username.return_value = 'login123'
         settings.ACCOUNTKEY = None
         test_getpass.return_value = 'pass25word'
         mock_resp = Mock()
@@ -164,8 +188,10 @@ class LogInForSessionTest(unittest.TestCase):
         self.test_session.return_value = session_mock
         self.assertEqual(session_mock, auth.log_in_for_session())
 
+    @patch('taktyk.auth.get_username')
     @patch('getpass.getpass')
-    def test_when_login_not_found(self, test_getpass):
+    def test_when_login_not_found(self, test_getpass, test_get_username):
+        test_get_username.return_value = 'name444'
         mock_get1 = Mock()
         mock_get1.text = '<html></html>'  # AttributeError
         mock_get2 = Mock()
@@ -176,8 +202,10 @@ class LogInForSessionTest(unittest.TestCase):
         auth.log_in_for_session()
         self.assertEqual(test_getpass.call_count, 2)
 
+    @patch('taktyk.auth.get_username')
     @patch('getpass.getpass')
-    def test_when_usernames_dont_match(self, test_getpass):
+    def test_when_usernames_dont_match(self, test_getpass, test_get_username):
+        test_get_username.return_value = 'name444'
         mock_get1 = Mock()
         mock_get1.text = '<html><img class="avatar" alt="wrongusername"></html>'
         mock_get2 = Mock()
