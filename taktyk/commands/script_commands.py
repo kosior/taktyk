@@ -127,7 +127,7 @@ class CheckForUpdate(AbsCommand):
 
     def get_github_version(self):
         response = Request.get(self.latest_release_url,
-                               msg='Wystąpił problem ze sprawdzaniem aktualizacji')
+                               msg='Wystąpił problem ze sprawdzaniem aktualizacji', skip=True)
         try:
             return response.url.rsplit('/', 1)[-1]
         except AttributeError:

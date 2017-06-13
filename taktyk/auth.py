@@ -173,9 +173,14 @@ def is_key_valid(appkey, userkey=None):
     if userkey:
         url += '/userkey/' + userkey
 
-    if 'error' in requests.get(url, headers=apisign(url, settings.SECRETKEY)).text:
+    try:
+        response = requests.get(url, headers=apisign(url, settings.SECRETKEY)).text
+    except requests.exceptions.RequestException:
         return False
-    return True
+    else:
+        if 'error' in response:
+            return False
+        return True
 
 
 def apisign(url_, secret=None, **post_kwargs):

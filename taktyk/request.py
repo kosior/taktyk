@@ -10,12 +10,14 @@ except ImportError:
 
 class Request:
     @classmethod
-    def get(cls, url, exit_=False, msg=None, **kwargs):
+    def get(cls, url, exit_=False, msg=None, skip=False, **kwargs):
         try:
             response = requests.get(url, **kwargs)
             response.raise_for_status()
         except requests.exceptions.ConnectionError:
             logging.critical('Brak połączenia z internetem')
+            if skip:
+                return None
             raise SystemExit
         except (requests.exceptions.HTTPError, requests.exceptions.RequestException) as err:
             logging.debug(url)
