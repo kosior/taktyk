@@ -108,7 +108,7 @@ class Multi:
     def __init__(self, count, func, end_clause='end', **func_kwargs):
         self.count = count
         self.func = func
-        self.queue = multiprocessing.Queue()
+        self.queue = multiprocessing.JoinableQueue()
         self.end_clause = end_clause
         self.func_kwargs = func_kwargs
 
@@ -127,9 +127,15 @@ class Multi:
     def _target(queue, func, end_clause, func_kwargs):
         while True:
             args = queue.get()
+            queue.task_done()
             if args == end_clause:
                 break
             func(args, func_kwargs)
 
     def put(self, value):
         self.queue.put(value)
+
+    def join(self):
+        if self.count:
+            self.queue.join()
+            logging.info('...pobieranie plików zakończone')

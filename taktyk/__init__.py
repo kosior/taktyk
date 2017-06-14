@@ -27,7 +27,9 @@ def pipeline(strategy, method):
     else:
         proc_count = 5
 
-    with DB.Connect() as cursor, Multi(proc_count, save_wrapper, exts=settings.EXTS) as mlt:
+    multi = Multi(proc_count, save_wrapper, exts=settings.EXTS)
+
+    with DB.Connect() as cursor, multi as mlt:
         settings.DB_IDS = DB.get_ids(cursor, 'entry')
         for raw_entry in strategy().execute():
             for entry in method().generate(raw_entry):
@@ -43,6 +45,8 @@ def pipeline(strategy, method):
     else:
         logging.info('...nie dodano żadnych wpisów ani komentarzy')
 
+    return multi
+
 
 def main():
     print('--- Aby zakończyć wciśnij Ctrl+C ---')
@@ -51,5 +55,6 @@ def main():
     configure_logging()
     ConfigFile().set_up()
     process_args(settings.STATIC_ARGS)
-    pipeline(settings.STRATEGY, settings.METHOD)
+    multi = pipeline(settings.STRATEGY, settings.METHOD)
     HtmlFile().create()
+    multi.join()

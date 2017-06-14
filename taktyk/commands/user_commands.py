@@ -129,6 +129,7 @@ class SaveCommand(AbsCommand):
                 for comment in entry.comments:
                     if comment.media_url and not settings.SKIP_FILES == 'com':
                         mlt.put(comment.download_info())
+        multi.join()
         sys.exit()
 
 
