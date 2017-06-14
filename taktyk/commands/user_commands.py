@@ -121,7 +121,7 @@ class SaveCommand(AbsCommand):
     def execute(self, *args):
         logging.info('...pobieranie plików z bazy danych')
         db_entries = DB.get_all_entries_with_comments()
-        multi = Multi(5, save_wrapper)
+        multi = Multi(5, save_wrapper, exts=settings.EXTS)
         with multi as mlt:
             for entry in db_entries:
                 if entry.media_url:

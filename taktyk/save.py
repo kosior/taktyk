@@ -11,13 +11,13 @@ class Save:
     gfycat = 'gfycat.com/'
     msg = 'Plik niezapisany: '
 
-    def __init__(self, id_, media_url, is_nsfw, local_file_path, cwd=None):
+    def __init__(self, id_, media_url, is_nsfw, local_file_path, exts, cwd=None):
         self.id_ = id_
         self.media_url = media_url
         self.is_nsfw = is_nsfw
         self.dir_path, self.file_name = os.path.split(local_file_path)
+        self.exts = exts
         self.cwd = cwd or settings.USER_FILES_PATH
-        self.exts = settings.EXTS
         self.gfycat_api = settings.GFYCAT_API
         self._ext = self.get_ext()
         self.url = self.get_file_url()
@@ -100,21 +100,22 @@ class Save:
             return True
 
 
-def save_wrapper(kwargs):
-    return Save(**kwargs).save()
+def save_wrapper(download_info_dict, kwargs):
+    return Save(**download_info_dict, **kwargs).save()
 
 
 class Multi:
-    def __init__(self, count, func, end_clause='end'):
+    def __init__(self, count, func, end_clause='end', **func_kwargs):
         self.count = count
         self.func = func
         self.queue = multiprocessing.Queue()
         self.end_clause = end_clause
+        self.func_kwargs = func_kwargs
 
     def __enter__(self):
         for _ in range(self.count):
             p = multiprocessing.Process(target=self._target,
-                                        args=(self.queue, self.func, self.end_clause))
+                                        args=(self.queue, self.func, self.end_clause, self.func_kwargs))
             p.start()
         return self
 
@@ -123,12 +124,12 @@ class Multi:
             self.queue.put(self.end_clause)
 
     @staticmethod
-    def _target(queue, func, end_clause):
+    def _target(queue, func, end_clause, func_kwargs):
         while True:
             args = queue.get()
             if args == end_clause:
                 break
-            func(args)
+            func(args, func_kwargs)
 
     def put(self, value):
         self.queue.put(value)

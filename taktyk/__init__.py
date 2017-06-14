@@ -27,7 +27,7 @@ def pipeline(strategy, method):
     else:
         proc_count = 5
 
-    with DB.Connect() as cursor, Multi(proc_count, save_wrapper) as mlt:
+    with DB.Connect() as cursor, Multi(proc_count, save_wrapper, exts=settings.EXTS) as mlt:
         settings.DB_IDS = DB.get_ids(cursor, 'entry')
         for raw_entry in strategy().execute():
             for entry in method().generate(raw_entry):
