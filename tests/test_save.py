@@ -11,12 +11,12 @@ from taktyk.save import Save
 
 class SaveTest(unittest.TestCase):
     def setUp(self):
-        settings.EXTS = ['.jpg']
+        exts = ['.jpg']
         id_ = 123
         media_url = 'http://url.com/file.jpg'
         is_nsfw = False
         local_file_path = '123.jpg'
-        self.save = Save(id_, media_url, is_nsfw, local_file_path, cwd='test')
+        self.save = Save(id_, media_url, is_nsfw, local_file_path, cwd='test', exts=exts)
 
     @patch('os.path.exists')
     def test_get_path_when_path_exist(self, mock_exists):
@@ -73,13 +73,13 @@ class SaveTest(unittest.TestCase):
 
     def test_nsfw_consistent(self):
         settings.NSFW_FILTER = True
-        self.assertFalse(Save(1, 'file.jpg', is_nsfw=True, local_file_path='1.jpg').nsfw_consistent)
+        self.assertFalse(Save(1, 'file.jpg', is_nsfw=True, local_file_path='1.jpg', exts=['.jpg']).nsfw_consistent)
         settings.NSFW_FILTER = True
-        self.assertTrue(Save(1, 'file.jpg', is_nsfw=False, local_file_path='1.jpg').nsfw_consistent)
+        self.assertTrue(Save(1, 'file.jpg', is_nsfw=False, local_file_path='1.jpg', exts=['.jpg']).nsfw_consistent)
         settings.NSFW_FILTER = False
-        self.assertTrue(Save(1, 'file.jpg', is_nsfw=True, local_file_path='1.jpg').nsfw_consistent)
+        self.assertTrue(Save(1, 'file.jpg', is_nsfw=True, local_file_path='1.jpg', exts=['.jpg']).nsfw_consistent)
         settings.NSFW_FILTER = False
-        self.assertTrue(Save(1, 'file.jpg', is_nsfw=False, local_file_path='1.jpg').nsfw_consistent)
+        self.assertTrue(Save(1, 'file.jpg', is_nsfw=False, local_file_path='1.jpg', exts=['.jpg']).nsfw_consistent)
 
     def test_save_when_no_url(self):
         self.save.url = None
