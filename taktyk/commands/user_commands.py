@@ -97,9 +97,9 @@ class DeleteCommand(AbsCommand):
     @staticmethod
     def delete_from_wykop(ids):
         auth.set_userkey()
-        url = settings.API_UNFAV_URL_F.format(userkey=settings.USERKEY, appkey=settings.APPKEY)
+        url_to_format = settings.API_UNFAV_URL_F.format(userkey=settings.USERKEY, appkey=settings.APPKEY)
         for id_ in ids:
-            url = url.format(id=id_)
+            url = url_to_format.format(id=id_)
             try:
                 Request.get_json(url, exit_=False, headers=auth.apisign(url, settings.SECRETKEY))
             except ValueError:
