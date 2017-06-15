@@ -14,10 +14,12 @@
 * **requests**, **selenium**, **jinja2**, **beautifulsoup4** - moduły zostaną zainstalowane automatycznie przy pierwszym uruchomieniu po uzyskaniu zgody od użytkownika
 
 # Instalacja:
-Wystarczy pobrać (klikając na samej górze Download .zip) i rozpakować archiwum.
+Wystarczy pobrać (klikając na samej górze Download .zip) i rozpakować archiwum*.
+
+*archiwum może się rozpakować do folderu o dziwnej nazwie, ale można ją sobie zmienić w celu łatwiejszej nawigacji. 
 
 # Uruchamianie:
-W wierszu poleceń/terminalu przejśc do folderu (`master-taktyk`), w którym znajduje się katalog `taktyk` oraz plik `taktyk.py` i wpisać:
+W wierszu poleceń/terminalu przejśc do folderu, w którym znajduje się katalog `taktyk` oraz plik `taktyk.py` i wpisać:
 
     python taktyk
    
@@ -86,3 +88,4 @@ W wygenerowanym pliku .html użytkownik ma następujące możliwości:
 - wszystkie adresy URL, na które wykonywane są jakiekolwiek requesty są w pliku `settings.py`
 - funkcje logowania itd. znajdują się w pliku `auth.py`
 - w przypadku problemów z WykopAPI program przełączy się automatycznie na scrapowanie
+- jeśli dostępna będzie aktualizacja użytkownik zostanie powiadomiony
