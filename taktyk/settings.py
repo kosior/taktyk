@@ -67,10 +67,10 @@ SELENIUM_DRIVER_PATH = None
 # Used modules:
 # [import_name, install_name, version]
 MODULES = [
-    ['requests', 'requests', '2.14.2'],
+    ['requests', 'requests', '2.18.1'],
     ['bs4', 'beautifulsoup4', '4.6.0'],
     ['jinja2', 'jinja2', '2.9.6'],
-    ['selenium', 'selenium', '3.4.2']
+    ['selenium', 'selenium', '3.4.3']
 ]
 
 # Other:
