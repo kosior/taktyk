@@ -99,11 +99,12 @@ class Decision:
 
     def run(self):
         while True:
-            answer = input(self.msg).lower()
-            if answer in self.options.keys():
-                if callable(self.options[answer]) or isinstance(self.options[answer], dict):
-                    return self._run_func(self.options[answer])
-                return self.options[answer]
+            answer = input(self.msg)
+            answer_low = answer.lower()
+            if answer_low in self.options.keys():
+                if callable(self.options[answer_low]) or isinstance(self.options[answer_low], dict):
+                    return self._run_func(self.options[answer_low])
+                return self.options[answer_low]
             elif self.validator:
                 try:
                     result = self.validator(answer)
