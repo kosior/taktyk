@@ -21,10 +21,10 @@ class ParseTest(unittest.TestCase):
             ('ids', False),
             ('selenium', None),
             ('session', False),
-            ('delete', None),
             ('skip', False),
             ('scrape', False),
             ('DBHandler', True),
+            ('delete', None),
             ('html', False),
             ('save', False),
             ('comments', False)]

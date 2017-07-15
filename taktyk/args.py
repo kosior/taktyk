@@ -39,14 +39,14 @@ def _parse(static_args=None):
                        choices=['firefox', 'chrome'])
     group.add_argument('-S', '--session', help='użyj requests.Session, aby pobrać numery wpisów',
                        action='store_true')
-    group.add_argument('-d', '--delete', help='usuwanie wpisów z wybranego zasięgu',
-                       choices=['db', 'wykop', 'all'])
 
     parser.add_argument('--skip', help='pomiń pobieranie plików', default=False, nargs='?',
                         const=True, choices=['com'])
     parser.add_argument('--scrape', help='włącz tryb scrapowania', action='store_true')
     parser.add_argument('--DBHandler', help=argparse.SUPPRESS, default=True)
 
+    group.add_argument('-d', '--delete', help='usuwanie wpisów z wybranego zasięgu',
+                       choices=['db', 'wykop', 'all'])
     group.add_argument('--html', help='utwórz ponownie plik html. '
                        'Opcjonalnie możesz podać tag, do którego zostaną ograniczone wpisy.',
                        default=False, nargs='?', const=True)
