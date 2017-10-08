@@ -76,6 +76,9 @@ W celu konfiguracji programu można edytować plik `config.ini` w folderze `takt
 - exts (rozszerzenia plików, które mają być pobierane)
 
 # Dokument HTML
+
+![](https://github.com/kosior/taktyk/raw/master/docs/screenshot.png)
+
 W wygenerowanym pliku .html użytkownik ma następujące możliwości:
 - filtrowanie wpisów po tagach
 - zaznaczanie wpisów i kopiowanie ich numerów do schowka (co ułatwia np. usuwanie wpisów z ulubionych)
